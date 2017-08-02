@@ -1,0 +1,7 @@
+base   lokiontology
+author GEIST Research Group
+email  geist@agh.edu.pl
+date   2016-04-09
+name   Loki Ontology plugin
+desc   Aids in ontology-based edition with Loki
+url    http://loki.ia.agh.edu.pl/
