@@ -11,6 +11,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
     const ONTOLOGY_XSLT_PATH = "lib/plugins/lokiontology/ontology.xslt";
     const ONTOLOGY_EDIT_XSLT_PATH = "lib/plugins/lokiontology/ontology_edit.xslt";
     const ONTOLOGY_JS_PATH = "lib/plugins/lokiontology/ontology_edit.js";
+    const AUTOCOMPLETE_JS_PATH = "lib/plugins/lokiontology/autocomplete/dist/bundle.js";
 
     function register(Doku_Event_Handler $controller)
     {
@@ -63,7 +64,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         $xml = new DomDocument();
         $xml->loadXML($pageEditField["_text"]);
         $js = file_get_contents(self::ONTOLOGY_JS_PATH);
-        $html = "<script type='text/javascript'>\n$js\n</script>" . $XSLTProcessor->transformToXML($xml);
+        $html = $this->toScriptTag($js) . $XSLTProcessor->transformToXML($xml);
 
         $wikiEditbar = $event->data->findElementByAttribute('id', 'wiki__editbar');
         $event->data->insertElement($wikiEditbar, $html);
@@ -71,7 +72,8 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
 
     private function insertAutocomplete(Doku_Event $event, $param)
     {
-
+        $js = file_get_contents(self::AUTOCOMPLETE_JS_PATH);
+        $event->data->addElement($this->toScriptTag($js));
     }
 
     private function transformWithXSLT($input)
@@ -83,6 +85,10 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
             "&&XML&&\n\n{$input}\n\n&&XSLT&&\n\n$xslt\n\n&&END&&",
             $flatInput
         );
+    }
+
+    private function toScriptTag($script) {
+        return "<script type='text/javascript'>\n$script\n</script>";
     }
 }
 
