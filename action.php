@@ -44,7 +44,8 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         foreach ($ontology_file_iterator as $ontology_file) {
             if ($ontology_file->getExtension() != 'txt') continue;
             $xml = simplexml_load_file($ontology_file->getPathname());
-            $result[(string)$xml->name] = $this->encodeOntology($xml);
+            $ontology_id = pathinfo($ontology_file->getFilename(), PATHINFO_FILENAME);
+            array_push($result, $this->encodeOntology($xml, $ontology_id));
         }
         $onto_json = json_encode($result);
         $onto_json_fp = fopen("data/pages/special/ontology/onto.json", 'w');
@@ -52,9 +53,10 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         fclose($onto_json_fp);
     }
 
-    private function encodeOntology($xml)
+    private function encodeOntology($xml, $id)
     {
-        $result = [];
+        $result = array();
+        $result['id'] = $id;
         foreach ($xml->children() as $xml_sequence_element) {
             if ($xml_sequence_element->getName() == "name") {
                 $result['name'] = (string) $xml_sequence_element;
@@ -68,7 +70,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
 
     private function encodeOntologyGroup($xml_sequence_element)
     {
-        $ontology_group = [];
+        $ontology_group = array();
         foreach ($xml_sequence_element->children() as $xml_element) {
             $ontology_element = $this->encodeOntologyElement($xml_element);
             array_push($ontology_group, $ontology_element);
@@ -78,10 +80,10 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
 
     private function encodeOntologyElement($xml_element)
     {
-        $ontology_element = [];
-        $xml_element_value = (string) $xml_element;
-        if ($xml_element_value != "") {
-            $ontology_element['value'] = $xml_element_value;
+        $ontology_element = array();
+        if ($xml_element->getName() == "class") {
+            $name = (string) $xml_element;
+            $ontology_element['name'] = $name;
         }
         foreach ($xml_element->attributes() as $key => $value ) {
             $ontology_element[$key] = (string) $value;
