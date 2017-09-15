@@ -12,15 +12,17 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
     const ONTOLOGY_EDIT_XSLT_PATH = "lib/plugins/lokiontology/ontology_edit.xslt";
     const ONTOLOGY_JS_PATH = "lib/plugins/lokiontology/ontology_edit.js";
     const AUTOCOMPLETE_JS_PATH = "lib/plugins/lokiontology/autocomplete/dist/bundle.js";
+    const ONTOLOGY_FOLDER_PATH = "data/pages/special/ontology/";
+    const ONTO_JSON_PATH = "data/pages/special/ontology/onto.json";
 
     function register(Doku_Event_Handler $controller)
     {
         //$controller->register_hook('IO_WIKIPAGE_WRITE', 'BEFORE', $this, "onSave");
-        $controller->register_hook('PARSER_WIKITEXT_PREPROCESS', 'BEFORE', $this, "wrap");
+        $controller->register_hook('PARSER_WIKITEXT_PREPROCESS', 'BEFORE', $this, "transformIfOntology");
         $controller->register_hook('HTML_EDITFORM_OUTPUT', 'BEFORE', $this, "onEdit");
     }
 
-    function wrap(Doku_Event $event, $param)
+    function transformIfOntology(Doku_Event $event, $param)
     {
         if(trim($event->data) == "")
             $event->data = self::EMPTY_ONTOLOGY;
@@ -31,6 +33,60 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
             return false;
 
         $event->data = $this->transformWithXSLT($event->data);
+
+        $this->createOntoJson();
+    }
+
+    private function createOntoJson()
+    {
+        $ontology_file_iterator = new FilesystemIterator("./data/pages/special/ontology/");
+        $result = array();
+        foreach ($ontology_file_iterator as $ontology_file) {
+            if ($ontology_file->getExtension() != 'txt') continue;
+            $xml = simplexml_load_file($ontology_file->getPathname());
+            $result[(string)$xml->name] = $this->encodeOntology($xml);
+        }
+        $onto_json = json_encode($result);
+        $onto_json_fp = fopen("data/pages/special/ontology/onto.json", 'w');
+        fwrite($onto_json_fp, $onto_json);
+        fclose($onto_json_fp);
+    }
+
+    private function encodeOntology($xml)
+    {
+        $result = [];
+        foreach ($xml->children() as $xml_sequence_element) {
+            if ($xml_sequence_element->getName() == "name") {
+                $result['name'] = (string) $xml_sequence_element;
+                continue;
+            }
+            $ontology_group = $this->encodeOntologyGroup($xml_sequence_element);
+            $result[(string)$xml_sequence_element->getName()] = $ontology_group;
+        }
+        return $result;
+    }
+
+    private function encodeOntologyGroup($xml_sequence_element)
+    {
+        $ontology_group = [];
+        foreach ($xml_sequence_element->children() as $xml_element) {
+            $ontology_element = $this->encodeOntologyElement($xml_element);
+            array_push($ontology_group, $ontology_element);
+        }
+        return $ontology_group;
+    }
+
+    private function encodeOntologyElement($xml_element)
+    {
+        $ontology_element = [];
+        $xml_element_value = (string) $xml_element;
+        if ($xml_element_value != "") {
+            $ontology_element['value'] = $xml_element_value;
+        }
+        foreach ($xml_element->attributes() as $key => $value ) {
+            $ontology_element[$key] = (string) $value;
+        }
+        return $ontology_element;
     }
 
     function onEdit(Doku_Event $event, $param)
