@@ -14,24 +14,38 @@ const classSearch = function (term, callback) {
     callback(matchedClasses);
 };
 
+function triggerTextcompleteAfterReplace() {
+    //workaround - no idea how to execute it after replace
+    setTimeout(function () {
+        textcomplete.trigger(editor.getBeforeCursor());
+    }, 200);
+}
+
 const setup = function (ontology) {
     window.ontology = ontology;
+    const textarea = document.getElementById('wiki__text');
+    const editor = new Textarea.default(textarea);
+    const textcomplete = new Textcomplete.default(editor);
     const classStrategy = {
         id: 'class',
         match: /(\[\[category:)([a-z0-9_\-.:]*)$/,
         search: classSearch,
-        template: function (name) {
-            return name;
-        },
         replace: function (name) {
-            return '$1:' + name + ']]';
+            return '$1' + name + ']]';
         }
     };
-
-
-    const editor = new Textarea.default(document.getElementById('wiki__text'));
-    const textcomplete = new Textcomplete.default(editor);
-    textcomplete.register([classStrategy]);
+    const categoryStrategy = {
+        id: 'category',
+        match: /(\[\[)([a-z0-9_\-.:]*)$/,
+        search: function(term, callback) {
+            callback(['category'].filter(w => w.startsWith(term)));
+        },
+        replace: function (name) {
+            triggerTextcompleteAfterReplace();
+            return '$1' + name + ':';
+        }
+    };
+    textcomplete.register([classStrategy, categoryStrategy]);
 };
 
 jQuery(document).ready(function () {
