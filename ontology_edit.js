@@ -7,6 +7,7 @@ var OntEdit =
 
         // Początek
         var ontology = "<ontology>";
+        ontology += "<id>" + JSINFO.id.split(":").slice(-1)[0] + "</id>";
         ontology += "<name>" + document.getElementById("name").value + "</name>";
 
         // Klasy

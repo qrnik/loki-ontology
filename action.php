@@ -44,8 +44,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         foreach ($ontology_file_iterator as $ontology_file) {
             if ($ontology_file->getExtension() != 'txt') continue;
             $xml = simplexml_load_file($ontology_file->getPathname());
-            $ontology_id = pathinfo($ontology_file->getFilename(), PATHINFO_FILENAME);
-            array_push($result, $this->encodeOntology($xml, $ontology_id));
+            array_push($result, $this->encodeOntology($xml));
         }
         $onto_json = json_encode($result);
         $onto_json_fp = fopen("data/pages/special/ontology/onto.json", 'w');
@@ -53,13 +52,13 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         fclose($onto_json_fp);
     }
 
-    private function encodeOntology($xml, $id)
+    private function encodeOntology($xml)
     {
         $result = array();
-        $result['id'] = $id;
         foreach ($xml->children() as $xml_sequence_element) {
-            if ($xml_sequence_element->getName() == "name") {
-                $result['name'] = (string) $xml_sequence_element;
+            $tagName = $xml_sequence_element->getName();
+            if ($tagName == "name" || $tagName == "id") {
+                $result[$tagName] = (string) $xml_sequence_element;
                 continue;
             }
             $ontology_group = $this->encodeOntologyGroup($xml_sequence_element);
@@ -81,12 +80,12 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
     private function encodeOntologyElement($xml_element)
     {
         $ontology_element = array();
+        foreach ($xml_element->attributes() as $key => $value ) {
+            $ontology_element[$key] = (string) $value;
+        }
         if ($xml_element->getName() == "class") {
             $name = (string) $xml_element;
             $ontology_element['name'] = $name;
-        }
-        foreach ($xml_element->attributes() as $key => $value ) {
-            $ontology_element[$key] = (string) $value;
         }
         return $ontology_element;
     }
