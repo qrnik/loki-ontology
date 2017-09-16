@@ -1,12 +1,22 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:template match="ontology">
         <h1><xsl:value-of select="name"/></h1>
+        <xsl:variable name="namespace">
+            <xsl:choose>
+                <xsl:when test="id = 'default'">
+                    <!--empty-->
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="concat(id, ':')"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <h2>Classes</h2>
         <ul>
             <xsl:for-each select="classes/class">
                 <li>
                     <xsl:variable name="classId" select="self::node()/@id"/>
-                    <a href='doku.php?id=special:ontology:_cat:{$classId}'>
+                    <a href='doku.php?id=special:category:{$namespace}{$classId}'>
                         <xsl:value-of select="self::node()"/>
                     </a>
                     <xsl:text> (ID: </xsl:text>
@@ -23,7 +33,7 @@
                     <xsl:variable name="subject" select="self::node()/@subject"/>
                     <xsl:variable name="object" select="self::node()/@object"/>
 
-                    <a href='doku.php?id=special:ontology:_cat:{$subject}'>
+                    <a href='doku.php?id=special:category:{$namespace}{$subject}'>
                         <xsl:value-of select="/ontology/classes/class[@id=$subject]"/>
                     </a>
 
@@ -31,7 +41,7 @@
                     <xsl:value-of select="self::node()/@type"/>
                     <xsl:text> -&gt; </xsl:text>
 
-                    <a href='doku.php?id=special:ontology:_cat:{$object}'>
+                    <a href='doku.php?id=special:category:{$namespace}{$object}'>
                         <xsl:value-of select="/ontology/classes/class[@id=$object]"/>
                     </a>
                 </li>
@@ -48,13 +58,13 @@
                     <xsl:value-of select="self::node()/@id"/>
                     <xsl:text>(</xsl:text>
 
-                    <a href='doku.php?id=special:ontology:_cat:{$subject}'>
+                    <a href='doku.php?id=special:category:{$namespace}{$subject}'>
                         <xsl:value-of select="/ontology/classes/class[@id=$subject]"/>
                     </a>
 
                     <xsl:text>, </xsl:text>
 
-                    <a href='doku.php?id=special:ontology:_cat:{$subject}'>
+                    <a href='doku.php?id=special:category:{$namespace}{$subject}'>
                         <xsl:value-of select="/ontology/classes/class[@id=$object]"/>
                     </a>
 
@@ -72,7 +82,7 @@
                     <xsl:value-of select="self::node()/@id"/>
                     <xsl:text>(</xsl:text>
 
-                    <a href='doku.php?id=special:ontology:_cat:{$domain}'>
+                    <a href='doku.php?id=special:category:{$namespace}{$domain}'>
                         <xsl:value-of select="/ontology/classes/class[@id=$domain]"/>
                     </a>
 
