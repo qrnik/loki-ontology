@@ -3,14 +3,14 @@ const Textcomplete = require('textcomplete/lib/textcomplete');
 const Textarea = require('textcomplete/lib/textarea');
 
 const classSearch = function (term, callback) {
-    const defaultOntology = window.ontology.find(ont => ont.id === 'default');
     const defaultClasses = defaultOntology ? defaultOntology.classes.map(c => c.id) : [];
     let qualifiedClasses = [];
-    window.ontology.filter(ont => ont.id !== 'default').forEach(
+    qualifiedOntology.forEach(
         ont => ont.classes.forEach(c => qualifiedClasses.push(ont.id + ":" + c.id))
     );
-    let matchedClasses = defaultClasses.filter(name => name.startsWith(term));
-    matchedClasses = matchedClasses.concat(qualifiedClasses.filter(name => name.split(":").some(w => w.startsWith(term))));
+    const matchedDefaultClasses = defaultClasses.filter(name => name.startsWith(term));
+    const matchedQualifiedClasses = qualifiedClasses.filter(name => name.split(":").some(w => w.startsWith(term)));
+    const matchedClasses = matchedDefaultClasses.concat(matchedQualifiedClasses);
     callback(matchedClasses);
 };
 
