@@ -28,7 +28,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
             $event->data = self::EMPTY_ONTOLOGY;
 
         $flatData = str_replace("\n", " ", $event->data);
-        $isNotOntology = preg_match("/^<ontology>.*<\/ontology>$/", $flatData) != 1;
+        $isNotOntology = preg_match("/^(<\?xml.*\?>)?<ontology>.*<\/ontology>$/", $flatData) != 1;
         if($isNotOntology)
             return false;
 
