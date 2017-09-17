@@ -4,9 +4,14 @@
   "description": "autocompletion library for lokiontology plugin",
   "main": "autocomplete.js",
   "dependencies": {
+    "karma": "^1.7.1",
+    "karma-jasmine": "^1.1.0",
     "textcomplete": "^0.13.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jasmine": "^2.8.0",
+    "karma-chrome-launcher": "^2.2.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
