@@ -1,4 +1,3 @@
-'use strict';
 module.exports = class Ontology {
     constructor(json) {
         for (let key in json) {

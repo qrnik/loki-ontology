@@ -1,4 +1,3 @@
-"use strict";
 const Textcomplete = require('textcomplete/lib/textcomplete');
 const Textarea = require('textcomplete/lib/textarea');
 const Ontology = require('./class/Ontology.js');
