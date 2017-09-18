@@ -1,4 +1,5 @@
 module.exports = class Ontology {
+    static DEFAULT_ID = 'default';
     constructor(json) {
         for (let key in json) {
             if (json.hasOwnProperty(key)) {
@@ -6,7 +7,11 @@ module.exports = class Ontology {
             }
         }
         this._subclassRelations = this.classRelations.filter(r => r.type === 'rdfs:subclassOf');
-        this.classes.forEach(c => c.superclasses = this._getSuperclasses(c.id));
+        this.classes.forEach(clazz => {
+            clazz.superclasses = this._getSuperclasses(clazz.id);
+            clazz.qualifiedId = this.toQualifiedId(clazz.id);
+        });
+        this.relations.forEach(relation => relation.qualifiedId = this._toQualifiedId(relation.id));
     }
 
     _getSuperclasses(classId) {
@@ -24,5 +29,9 @@ module.exports = class Ontology {
             superclasses.push(...superSuperclasses);
         }
         return superclasses;
+    }
+
+    _toQualifiedId(elementId) {
+        return (this.id === Ontology.DEFAULT_ID) ? elementId : this.id + ":" + elementId;
     }
 }
