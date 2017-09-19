@@ -1,6 +1,6 @@
 module.exports = class Ontology {
-    static DEFAULT_ID = 'default';
     constructor(json) {
+        Ontology.DEFAULT_ID = 'default';
         for (let key in json) {
             if (json.hasOwnProperty(key)) {
                 this[key] = json[key];
