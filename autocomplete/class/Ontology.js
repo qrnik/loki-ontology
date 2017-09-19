@@ -6,12 +6,13 @@ module.exports = class Ontology {
                 this[key] = json[key];
             }
         }
-        this._subclassRelations = this.classRelations.filter(r => r.type === 'rdfs:subclassOf');
+        this._subclassRelations = this.classRelations.filter(relation => relation.type === 'rdfs:subclassOf');
         this.classes.forEach(clazz => {
             clazz.superclasses = this._getSuperclasses(clazz.id);
-            clazz.qualifiedId = this.toQualifiedId(clazz.id);
+            this._addQualifiedId(clazz);
         });
-        this.relations.forEach(relation => relation.qualifiedId = this._toQualifiedId(relation.id));
+        this.objectProperties.forEach(objectProp => this._addQualifiedId(objectProp));
+        this.dataProperties.forEach(dataProp => this._addQualifiedId(dataProp));
     }
 
     _getSuperclasses(classId) {
@@ -29,6 +30,10 @@ module.exports = class Ontology {
             superclasses.push(...superSuperclasses);
         }
         return superclasses;
+    }
+
+    _addQualifiedId(element) {
+        element.qualifiedId = this._toQualifiedId(element.id);
     }
 
     _toQualifiedId(elementId) {
