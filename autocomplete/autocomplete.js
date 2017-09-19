@@ -1,20 +1,8 @@
 const Textcomplete = require('textcomplete/lib/textcomplete');
 const Textarea = require('textcomplete/lib/textarea');
-const Ontology = require('./class/Ontology.js');
+const Ontologies = require('./class/Ontologies.js');
 
-const classSearch = function (term, callback) {
-    const defaultClasses = defaultOntology ? defaultOntology.classes.map(c => c.id) : [];
-    let qualifiedClasses = [];
-    qualifiedOntology.forEach(
-        ont => ont.classes.forEach(c => qualifiedClasses.push(ont.id + ":" + c.id))
-    );
-    const matchedDefaultClasses = defaultClasses.filter(name => name.startsWith(term));
-    const matchedQualifiedClasses = qualifiedClasses.filter(name => name.split(":").some(w => w.startsWith(term)));
-    const matchedClasses = matchedDefaultClasses.concat(matchedQualifiedClasses);
-    callback(matchedClasses);
-};
-
-function triggerTextcompleteAfterReplace() {
+function triggerAfterReplace(textcomplete, editor) {
     //workaround - no idea how to execute it after replace
     setTimeout(function () {
         textcomplete.trigger(editor.getBeforeCursor());
@@ -22,9 +10,7 @@ function triggerTextcompleteAfterReplace() {
 }
 
 const setup = function (jsonArray) {
-    window.ontologies = jsonArray.map(json => new Ontology(json));
-    window.defaultOntology = ontologies.find(ont => ont.id === 'default');
-    window.qualifiedOntology = ontologies.filter(ont => ont.id !== 'default');
+    window.ontologies = new Ontologies(jsonArray);
     window.categories = [];
     const textarea = document.getElementById('wiki__text');
     const editor = new Textarea.default(textarea);
@@ -32,7 +18,7 @@ const setup = function (jsonArray) {
     const classStrategy = {
         id: 'class',
         match: /(\[\[category:)([a-z0-9_\-.:]*)$/,
-        search: classSearch,
+        search: (term, callback) => callback(ontologies.searchClasses(term)),
         replace: function (name) {
             return '$1' + name + ']]';
         }
@@ -44,7 +30,7 @@ const setup = function (jsonArray) {
             callback(['category'].filter(w => w.startsWith(term)));
         },
         replace: function (name) {
-            triggerTextcompleteAfterReplace();
+            triggerAfterReplace(textcomplete, editor);
             return '$1' + name + ':';
         }
     };
