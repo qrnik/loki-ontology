@@ -1,6 +1,5 @@
 module.exports = class Ontology {
     constructor(json) {
-        Ontology.DEFAULT_ID = 'default';
         for (let key in json) {
             if (json.hasOwnProperty(key)) {
                 this[key] = json[key];
@@ -39,4 +38,5 @@ module.exports = class Ontology {
     _toQualifiedId(elementId) {
         return (this.id === Ontology.DEFAULT_ID) ? elementId : this.id + ":" + elementId;
     }
-}
+};
+module.exports.DEFAULT_ID = 'default';
