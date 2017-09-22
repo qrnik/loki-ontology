@@ -5,19 +5,19 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '../../../..', // DOKUWIKI/lib
+    basePath: '..',
 
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'browserify'],
 
 
     // list of files / patterns to load in the browser
     files: [
-        'scripts/jquery/jquery.min.js',
-      'plugins/lokiontology/autocomplete/dist/bundle.js',
-      'plugins/lokiontology/autocomplete/test/*.js'
+      'test/*.js',
+        'node_modules/karma-read-json/karma-read-json.js',
+        {pattern: 'test/onto.json', included: false, served: true}
     ],
 
 
@@ -29,6 +29,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      'test/*.js': ['browserify']
     },
 
 
@@ -71,7 +72,8 @@ module.exports = function(config) {
       // plugins
       plugins: [
           'karma-chrome-launcher',
-          'karma-jasmine'
+          'karma-jasmine',
+          'karma-browserify'
       ]
   })
 }
