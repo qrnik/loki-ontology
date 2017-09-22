@@ -3,9 +3,9 @@ const Textarea = require('textcomplete/lib/textarea');
 
 module.exports = class Autocomplete {
     constructor(textarea, ontologies) {
-        this.editor = new Textarea.default(textarea);
-        this.textcomplete = new Textcomplete.default(this.editor);
-        this.ontologies = ontologies;
+        this._editor = new Textarea.default(textarea);
+        this._textcomplete = new Textcomplete.default(this._editor);
+        this._ontologies = ontologies;
         this.strategy = {
             CLASS: this._classStrategy(),
             CATEGORY: this._categoryStrategy()
@@ -13,7 +13,7 @@ module.exports = class Autocomplete {
     }
 
     register(...strategies) {
-        this.textcomplete.register(strategies);
+        this._textcomplete.register(strategies);
     }
 
     setScanner(scanner) {
@@ -23,7 +23,7 @@ module.exports = class Autocomplete {
     }
 
     _updateCategories() {
-        this.categories = this._scanner.categories;
+        this._categories = this._scanner.categories;
     }
 
     _classStrategy() {
@@ -31,7 +31,7 @@ module.exports = class Autocomplete {
             id: 'class',
             match: /(\[\[category:)([a-z0-9_\-.:]*)$/,
             search: (term, callback) =>
-                        callback(this.ontologies.searchClasses(term)),
+                        callback(this._ontologies.searchClasses(term)),
             replace: clazz => `$1${clazz}]]`
         };
     }
@@ -53,7 +53,7 @@ module.exports = class Autocomplete {
         //workaround - no idea how to execute it after replace
         let self = this;
         setTimeout(function () {
-            self.textcomplete.trigger(self.editor.getBeforeCursor());
+            self._textcomplete.trigger(self._editor.getBeforeCursor());
         }, delay);
     }
 };
