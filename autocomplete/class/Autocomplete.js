@@ -16,6 +16,16 @@ module.exports = class Autocomplete {
         this.textcomplete.register(strategies);
     }
 
+    setScanner(scanner) {
+        this._scanner = scanner;
+        scanner.emitter.on('scan', this._updateCategories.bind(this));
+        this._updateCategories();
+    }
+
+    _updateCategories() {
+        this.categories = this._scanner.categories;
+    }
+
     _classStrategy() {
         return {
             id: 'class',
