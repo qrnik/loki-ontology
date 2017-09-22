@@ -4,13 +4,18 @@
   "description": "autocompletion library for lokiontology plugin",
   "main": "autocomplete.js",
   "dependencies": {
-    "karma": "^1.7.1",
-    "karma-jasmine": "^1.1.0",
+    "event-emitter": "^0.3.5",
     "textcomplete": "^0.13.1"
   },
   "devDependencies": {
+    "browserify": "^14.4.0",
     "jasmine": "^2.8.0",
-    "karma-chrome-launcher": "^2.2.0"
+    "karma-browserify": "^5.1.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma": "^1.7.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-read-json": "^1.1.0",
+    "watchify": "^3.9.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
