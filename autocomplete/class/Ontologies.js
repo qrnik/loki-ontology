@@ -2,6 +2,9 @@ const Ontology = require('./Ontology.js');
 
 module.exports = class Ontologies {
     constructor(jsonArray) {
+        if (!jsonArray) {
+            throw new ReferenceError('null argument supplied to Ontologies constructor');
+        }
         this.all = jsonArray.map(json => new Ontology(json));
         this.defaultOntology = this.all.find(ont => ont.id === Ontology.DEFAULT_ID);
         this.qualified = this.all.filter(ont => ont.id !== Ontology.DEFAULT_ID);
@@ -13,7 +16,9 @@ module.exports = class Ontologies {
 
     searchClasses(term) {
         return this.classes.filter(
-            id => id.split(":").some(word => word.startsWith(term))
+            id => id.split(":")
+                .concat([id])
+                .some(word => word.startsWith(term))
         );
     }
 };

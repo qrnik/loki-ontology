@@ -1,0 +1,131 @@
+[
+  {
+    "id": "default",
+    "name": "def",
+    "classes": [
+      {
+        "id": "x",
+        "name": "x"
+      }
+    ],
+    "classRelations": [],
+    "objectProperties": [],
+    "dataProperties": [],
+    "propertyRelations": []
+  },
+  {
+    "id": "media",
+    "name": "MediaOntology",
+    "classes": [
+      {
+        "id": "actor",
+        "name": "Actor"
+      },
+      {
+        "id": "book",
+        "name": "Book"
+      },
+      {
+        "id": "classiccd",
+        "name": "Classical Music CD"
+      },
+      {
+        "id": "computergame",
+        "name": "ComputerGame"
+      },
+      {
+        "id": "mediathing",
+        "name": "Media Thing"
+      },
+      {
+        "id": "movie",
+        "name": "Movie"
+      },
+      {
+        "id": "musiccd",
+        "name": "Music CD"
+      },
+      {
+        "id": "person",
+        "name": "Person"
+      },
+      {
+        "id": "singer",
+        "name": "Singer"
+      }
+    ],
+    "classRelations": [
+      {
+        "type": "rdfs:subclassOf",
+        "subject": "actor",
+        "object": "person"
+      },
+      {
+        "type": "rdfs:subclassOf",
+        "subject": "book",
+        "object": "mediathing"
+      },
+      {
+        "type": "rdfs:subclassOf",
+        "subject": "classiccd",
+        "object": "musiccd"
+      },
+      {
+        "type": "rdfs:subclassOf",
+        "subject": "computergame",
+        "object": "mediathing"
+      },
+      {
+        "type": "rdfs:subclassOf",
+        "subject": "movie",
+        "object": "mediathing"
+      },
+      {
+        "type": "rdfs:subclassOf",
+        "subject": "musiccd",
+        "object": "mediathing"
+      }
+    ],
+    "objectProperties": [
+      {
+        "id": "isConnectedWith",
+        "subject": "person",
+        "object": "mediathing"
+      },
+      {
+        "id": "playsIn",
+        "subject": "actor",
+        "object": "movie"
+      },
+      {
+        "id": "singsOn",
+        "subject": "singer",
+        "object": "musiccd"
+      }
+    ],
+    "dataProperties": [
+      {
+        "id": "name",
+        "domain": "mediathing",
+        "range": "xslt:String"
+      },
+      {
+        "id": "year",
+        "domain": "mediathing",
+        "range": "xslt:String"
+      }
+    ],
+    "propertyRelations": [
+      {
+        "type": "rdfs:subpropertyOf",
+        "subject": "playsIn",
+        "object": "isConnectedWith"
+      },
+      {
+        "type": "rdfs:subpropertyOf",
+        "subject": "singsOn",
+        "object": "isConnectedWith"
+      }
+    ]
+  }
+]

@@ -1,5 +1,8 @@
 module.exports = class Ontology {
     constructor(json) {
+        if (!json) {
+            throw new ReferenceError('null argument supplied to Ontology constructor');
+        }
         for (let key in json) {
             if (json.hasOwnProperty(key)) {
                 this[key] = json[key];
