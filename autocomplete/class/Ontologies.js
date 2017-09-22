@@ -16,7 +16,9 @@ module.exports = class Ontologies {
 
     searchClasses(term) {
         return this.classes.filter(
-            id => id.split(":").some(word => word.startsWith(term))
+            id => id.split(":")
+                .concat([id])
+                .some(word => word.startsWith(term))
         );
     }
 };

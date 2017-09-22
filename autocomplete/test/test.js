@@ -26,6 +26,7 @@ describe("Ontologies", function() {
     it("have classes that can be searched", function() {
         expect(ontologies.searchClasses("me")).toEqual(ontologies.qualified[0].classes.map(c => c.qualifiedId));
         expect(ontologies.searchClasses("ac")).toEqual(['media:actor']);
+        expect(ontologies.searchClasses("media:ac")).toEqual(['media:actor']);
     });
 });
 
