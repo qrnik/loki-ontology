@@ -30,9 +30,16 @@ describe("Ontologies", function () {
         expect(ontologies.searchClasses("media:ac")).toEqual(['media:actor']);
     });
 
-    it("have relations that can be searched", function() {
-        const expectedRelations = new Set(['media:playsIn', 'media:isConnectedWith']);
-        expect(new Set(ontologies.searchRelations(['media:actor'], ''))).toEqual(expectedRelations);
+    it("have properties that can be searched", function() {
+        const expectedActorProperties = new Set(['media:playsIn', 'media:isConnectedWith']);
+        expect(new Set(ontologies.searchProperties(['media:actor'], ''))).toEqual(expectedActorProperties);
+        const expectedMediathingProperties = new Set(['media:name', 'media:year']);
+        expect(new Set(ontologies.searchProperties(['media:mediathing'], ''))).toEqual(expectedMediathingProperties);
+    });
+
+    it("allows to check whether something is relation", function() {
+       expect(ontologies.isRelation('media:playsIn')).toBeTruthy();
+       expect(ontologies.isRelation('media:name')).toBeFalsy();
     });
 });
 
@@ -55,7 +62,12 @@ describe("Ontology", function () {
 
     it("can find relations by subject's class", function() {
         const correctRelations = new Set(['media:isConnectedWith', 'media:playsIn']);
-        expect(new Set(mediaOntology.getRelationsByClass('actor'))).toEqual(correctRelations);
+        expect(new Set(mediaOntology._getRelationsByClass('actor'))).toEqual(correctRelations);
+    });
+
+    it("can find attributes by subject's class", function() {
+       const correctAttributes = new Set(['media:name', 'media:year']);
+        expect(new Set(mediaOntology._getAttributesByClass('musiccd'))).toEqual(correctAttributes);
     });
 });
 
@@ -128,8 +140,15 @@ describe("Autocomplete", function () {
 
     it("allows to complete relations", function () {
         write(textarea, '[[category:media:actor]]');
-        const correctRelations = new Set(['media:isConnectedWith', 'media:playsIn']);
-        const completionRelations = autocompletion(textarea.value + '[[').filter(name => name !== 'category');
-        expect(new Set(completionRelations)).toEqual(correctRelations);
+        const completion = autocompletion(textarea.value + '[[');
+        expect(completion).toContain('media:isConnectedWith');
+        expect(completion).toContain('media:playsIn');
+    });
+
+    it("allows to complete attributes", function() {
+        write(textarea, '[[category:media:mediathing]]');
+        const completion = autocompletion(textarea.value + '[[');
+        expect(completion).toContain('media:name');
+        expect(completion).toContain('media:year');
     });
 });
