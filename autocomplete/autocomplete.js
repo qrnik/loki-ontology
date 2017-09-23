@@ -6,7 +6,6 @@ const setup = function (jsonArray) {
     const ontologies = new Ontologies(jsonArray);
     const textarea = document.getElementById('wiki__text');
     const autocomplete = new Autocomplete(textarea, ontologies);
-    autocomplete.register(autocomplete.strategy.CLASS, autocomplete.strategy.CATEGORY);
     const scanner = new Scanner(textarea);
     autocomplete.setScanner(scanner);
 };

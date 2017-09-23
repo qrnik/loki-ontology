@@ -17,6 +17,13 @@ module.exports = class Ontology {
         this.dataProperties.forEach(dataProp => this._addQualifiedId(dataProp));
     }
 
+    getRelationsByClass(clazzId) {
+        const clazz = this.classes.find(clazz => clazz.id === clazzId);
+        return this.objectProperties
+            .filter(prop => clazz.superclasses.indexOf(prop.subject) !== -1)
+            .map(prop => prop.qualifiedId);
+    }
+
     _getSuperclasses(classId) {
         let superclasses = [classId];
         let directSuperclasses = this._subclassRelations
@@ -40,6 +47,14 @@ module.exports = class Ontology {
 
     _toQualifiedId(elementId) {
         return (this.id === Ontology.DEFAULT_ID) ? elementId : this.id + ":" + elementId;
+    }
+
+    static splitQualifiedId(qualifiedId) {
+        let array = qualifiedId.split(":");
+        if (array.length === 1) {
+            array.unshift(Ontology.DEFAULT_ID);
+        }
+        return array;
     }
 };
 module.exports.DEFAULT_ID = 'default';

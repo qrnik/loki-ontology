@@ -29,6 +29,11 @@ describe("Ontologies", function () {
         expect(ontologies.searchClasses("ac")).toEqual(['media:actor']);
         expect(ontologies.searchClasses("media:ac")).toEqual(['media:actor']);
     });
+
+    it("have relations that can be searched", function() {
+        const expectedRelations = new Set(['media:playsIn', 'media:isConnectedWith']);
+        expect(new Set(ontologies.searchRelations(['media:actor'], ''))).toEqual(expectedRelations);
+    });
 });
 
 describe("Ontology", function () {
@@ -41,6 +46,16 @@ describe("Ontology", function () {
         const classicCdClass = mediaOntology.classes.find(c => c.id === 'classiccd');
         const correctSuperclasses = new Set(['classiccd', 'musiccd', 'mediathing']);
         expect(new Set(classicCdClass.superclasses)).toEqual(correctSuperclasses);
+    });
+
+    it("can turn qualifiedId to array", function() {
+        expect(Ontology.splitQualifiedId('media:actor')).toEqual(['media','actor']);
+        expect(Ontology.splitQualifiedId('class')).toEqual([Ontology.DEFAULT_ID, 'class']);
+    });
+
+    it("can find relations by subject's class", function() {
+        const correctRelations = new Set(['media:isConnectedWith', 'media:playsIn']);
+        expect(new Set(mediaOntology.getRelationsByClass('actor'))).toEqual(correctRelations);
     });
 });
 
@@ -89,7 +104,6 @@ describe("Autocomplete", function () {
         getOntoJson();
         window.textarea = document.createElement('textarea');
         window.autocomplete = new Autocomplete(textarea, ontologies);
-        autocomplete.register(autocomplete.strategy.CLASS, autocomplete.strategy.CATEGORY);
         window.scanner = new Scanner(textarea);
         autocomplete.setScanner(scanner);
         Array.from(document.getElementsByClassName('textcomplete-item')).map(i => i.remove());
@@ -102,13 +116,20 @@ describe("Autocomplete", function () {
     });
 
     it("allows to complete '[[category:'", function () {
-        const firstName = autocompletion('[[')[0];
-        expect(firstName).toBe('category');
+        const completion = autocompletion('[[');
+        expect(completion).toContain('category');
         //TODO: select item
     });
 
     it("allows to complete classes", function () {
-        const autocompletionNames = autocompletion('[[category:');
-        expect(new Set(autocompletionNames)).toEqual(new Set(ontologies.classes));
+        const completionClasses = autocompletion('[[category:');
+        expect(new Set(completionClasses)).toEqual(new Set(ontologies.classes));
+    });
+
+    it("allows to complete relations", function () {
+        write(textarea, '[[category:media:actor]]');
+        const correctRelations = new Set(['media:isConnectedWith', 'media:playsIn']);
+        const completionRelations = autocompletion(textarea.value + '[[').filter(name => name !== 'category');
+        expect(new Set(completionRelations)).toEqual(correctRelations);
     });
 });
