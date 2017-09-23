@@ -18,17 +18,25 @@ module.exports = class Ontologies {
         return this.classes.filter(qid => Ontologies._matchQualifiedId(qid, term));
     }
 
-    searchRelations(categories, term) {
-        const relations = this._getRelationsByClass(categories);
+    searchProperties(categories, term) {
+        const relations = this._getPropertiesByClass(categories);
         return relations.filter(qid => Ontologies._matchQualifiedId(qid, term))
     }
 
-    _getRelationsByClass(categories) {
+    isRelation(qualifiedId) {
+        const [ontId, relId] = Ontology.splitQualifiedId(qualifiedId);
+        return this.all
+            .find(ont => ont.id === ontId)
+            .objectProperties
+            .find(rel => rel.id === relId);
+    }
+
+    _getPropertiesByClass(categories) {
         return categories
             .map(Ontology.splitQualifiedId)
             .map(array => {
                 let [ontId, clazz] = array;
-                return this.all.find(ont => ont.id === ontId).getRelationsByClass(clazz);
+                return this.all.find(ont => ont.id === ontId).getPropertiesByClass(clazz);
             })
             .reduce(Ontologies._flatten, []);
     }

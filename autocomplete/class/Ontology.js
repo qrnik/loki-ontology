@@ -17,11 +17,23 @@ module.exports = class Ontology {
         this.dataProperties.forEach(dataProp => this._addQualifiedId(dataProp));
     }
 
-    getRelationsByClass(clazzId) {
+    getPropertiesByClass(clazzId) {
+        return this._getRelationsByClass(clazzId)
+            .concat(this._getAttributesByClass(clazzId));
+    }
+
+    _getRelationsByClass(clazzId) {
         const clazz = this.classes.find(clazz => clazz.id === clazzId);
         return this.objectProperties
             .filter(prop => clazz.superclasses.indexOf(prop.subject) !== -1)
             .map(prop => prop.qualifiedId);
+    }
+
+    _getAttributesByClass(clazzId) {
+        const clazz = this.classes.find(clazz => clazz.id === clazzId);
+        return this.dataProperties
+            .filter(prop => clazz.superclasses.indexOf(prop.domain) !== -1)
+            .map(prop => prop.qualifiedId)
     }
 
     _getSuperclasses(classId) {

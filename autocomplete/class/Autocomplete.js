@@ -28,9 +28,9 @@ module.exports = class Autocomplete {
     }
 
     _searchProperty(term, callback) {
-        const relationMatches = this._ontologies.searchRelations(this._categories, term);
+        const propertyMatches = this._ontologies.searchProperties(this._categories, term);
         const categoryMatch = ['category'].filter(c => c.startsWith(term));
-        const matches = relationMatches.concat(categoryMatch);
+        const matches = propertyMatches.concat(categoryMatch);
         callback(matches);
     }
 
@@ -38,8 +38,10 @@ module.exports = class Autocomplete {
         if (property === 'category') {
             this._triggerAfterDelay(200);
             return '[[category:';
-        } else {
+        } else if (this._ontologies.isRelation(property)) {
             return `[[${property}::`;
+        } else { //is attribute
+            return `[[${property}:=`;
         }
     }
 
