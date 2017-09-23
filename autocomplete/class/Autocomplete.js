@@ -6,14 +6,41 @@ module.exports = class Autocomplete {
         this._editor = new Textarea.default(textarea);
         this._textcomplete = new Textcomplete.default(this._editor);
         this._ontologies = ontologies;
-        this.strategy = {
-            CLASS: this._classStrategy(),
-            CATEGORY: this._categoryStrategy()
+        this._textcomplete.register([this._classStrategy(), this._propertyStrategy()]);
+    }
+
+    _classStrategy() {
+        return {
+            id: 'class',
+            match: /(\[\[category:)([a-z0-9_\-.:]*)$/,
+            search: (term, callback) => callback(this._ontologies.searchClasses(term)),
+            replace: clazz => `$1${clazz}]]`
         };
     }
 
-    register(...strategies) {
-        this._textcomplete.register(strategies);
+    _propertyStrategy() {
+        return {
+            id: 'relation',
+            match: /(\[\[)([a-z0-9_\-.:]*)$/,
+            search: this._searchProperty.bind(this),
+            replace: this._replaceProperty.bind(this)
+        };
+    }
+
+    _searchProperty(term, callback) {
+        const relationMatches = this._ontologies.searchRelations(this._categories, term);
+        const categoryMatch = ['category'].filter(c => c.startsWith(term));
+        const matches = relationMatches.concat(categoryMatch);
+        callback(matches);
+    }
+
+    _replaceProperty(property) {
+        if (property === 'category') {
+            this._triggerAfterDelay(200);
+            return '[[category:';
+        } else {
+            return `[[${property}::`;
+        }
     }
 
     setScanner(scanner) {
@@ -24,29 +51,6 @@ module.exports = class Autocomplete {
 
     _updateCategories() {
         this._categories = this._scanner.categories;
-    }
-
-    _classStrategy() {
-        return {
-            id: 'class',
-            match: /(\[\[category:)([a-z0-9_\-.:]*)$/,
-            search: (term, callback) =>
-                        callback(this._ontologies.searchClasses(term)),
-            replace: clazz => `$1${clazz}]]`
-        };
-    }
-
-    _categoryStrategy() {
-        return {
-            id: 'category',
-            match: /(\[\[)([a-z0-9_\-.:]*)$/,
-            search: (term, callback) =>
-                        callback(['category'].filter(w => w.startsWith(term))),
-            replace: name => {
-                this._triggerAfterDelay(200);
-                return `$1${name}:`;
-            }
-        };
     }
 
     _triggerAfterDelay(delay) {
