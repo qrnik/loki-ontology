@@ -41,5 +41,13 @@ module.exports = class Ontology {
     _toQualifiedId(elementId) {
         return (this.id === Ontology.DEFAULT_ID) ? elementId : this.id + ":" + elementId;
     }
+
+    static splitQualifiedId(qualifiedId) {
+        let array = qualifiedId.split(":");
+        if (array.length === 1) {
+            array.unshift(Ontology.DEFAULT_ID);
+        }
+        return array;
+    }
 };
 module.exports.DEFAULT_ID = 'default';

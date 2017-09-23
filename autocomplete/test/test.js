@@ -42,6 +42,11 @@ describe("Ontology", function () {
         const correctSuperclasses = new Set(['classiccd', 'musiccd', 'mediathing']);
         expect(new Set(classicCdClass.superclasses)).toEqual(correctSuperclasses);
     });
+
+    it("can turn qualifiedId to array", function() {
+        expect(Ontology.splitQualifiedId('media:actor')).toEqual(['media','actor']);
+        expect(Ontology.splitQualifiedId('class')).toEqual([Ontology.DEFAULT_ID, 'class']);
+    })
 });
 
 function write(textarea, text) {
