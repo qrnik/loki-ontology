@@ -17,6 +17,13 @@ module.exports = class Ontology {
         this.dataProperties.forEach(dataProp => this._addQualifiedId(dataProp));
     }
 
+    getRelationsByClass(clazzId) {
+        const clazz = this.classes.find(clazz => clazz.id === clazzId);
+        return this.objectProperties
+            .filter(prop => clazz.superclasses.indexOf(prop.subject) !== -1)
+            .map(prop => prop.qualifiedId);
+    }
+
     _getSuperclasses(classId) {
         let superclasses = [classId];
         let directSuperclasses = this._subclassRelations

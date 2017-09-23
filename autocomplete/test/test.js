@@ -46,7 +46,12 @@ describe("Ontology", function () {
     it("can turn qualifiedId to array", function() {
         expect(Ontology.splitQualifiedId('media:actor')).toEqual(['media','actor']);
         expect(Ontology.splitQualifiedId('class')).toEqual([Ontology.DEFAULT_ID, 'class']);
-    })
+    });
+
+    it("can find relations by subject's class", function() {
+        const correctRelations = new Set(['media:isConnectedWith', 'media:playsIn']);
+        expect(new Set(mediaOntology.getRelationsByClass('actor'))).toEqual(correctRelations);
+    });
 });
 
 function write(textarea, text) {
