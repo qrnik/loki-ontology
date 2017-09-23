@@ -29,6 +29,11 @@ describe("Ontologies", function () {
         expect(ontologies.searchClasses("ac")).toEqual(['media:actor']);
         expect(ontologies.searchClasses("media:ac")).toEqual(['media:actor']);
     });
+
+    it("have relations that can be searched", function() {
+        const expectedRelations = new Set(['media:playsIn', 'media:isConnectedWith']);
+        expect(new Set(ontologies.searchRelations(['media:actor'], ''))).toEqual(expectedRelations);
+    });
 });
 
 describe("Ontology", function () {
