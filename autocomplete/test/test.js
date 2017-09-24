@@ -155,8 +155,25 @@ describe("Autocomplete", function () {
 });
 
 describe("Query", function() {
-   it("constructs valid SPARQL query", function () {
-       const expected = 'SELECT ?page WHERE {?page a ?cat . FILTER (?cat="test"||?cat="movie")}';
-       expect(Query.selectPages.categoryIn(['test', 'movie']).build()).toBe(expected);
-   });
+    beforeEach(function () {
+        window.testQuery = Query.selectPages.categoryIn(['test', 'movie']);
+    });
+
+    it("constructs valid SPARQL query", function () {
+        const expected = 'SELECT ?page WHERE {?page a ?cat . FILTER (?cat="test"||?cat="movie")}';
+        expect(testQuery.toString()).toBe(expected);
+    });
+
+    it("allows to execute query", function (done) {
+        function callback(result) {
+            const expected = new Set(['movies:last_crusade', 'movies:raiders_of_the_lost_ark',
+            'movies:temple_of_doom', 'test', 'test2']);
+            expect(new Set(result)).toEqual(expected);
+            done();
+        }
+        const absoluteSparqlEndpoint = '//localhost/dokuwiki/sparql';
+        const spy = spyOnProperty(Query, 'SPARQL_ENDPOINT', 'get').and
+            .returnValue(absoluteSparqlEndpoint);
+        testQuery.execute(callback);
+    });
 });

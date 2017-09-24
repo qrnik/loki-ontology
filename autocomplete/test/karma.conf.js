@@ -17,6 +17,7 @@ module.exports = function(config) {
     files: [
       'test/*.js',
         'node_modules/karma-read-json/karma-read-json.js',
+        'node_modules/jquery/dist/jquery.js',
         {pattern: 'test/onto.json', included: false, served: true}
     ],
 
