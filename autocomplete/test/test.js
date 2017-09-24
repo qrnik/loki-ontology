@@ -2,6 +2,7 @@ const Ontologies = require('../class/Ontologies.js');
 const Ontology = require('../class/Ontology.js');
 const Scanner = require('../class/Scanner.js');
 const Autocomplete = require('../class/Autocomplete.js');
+const Query = require('../class/Query.js');
 
 function getOntoJson() {
     window.ontologies = new Ontologies(readJSON('test/onto.json'));
@@ -145,10 +146,17 @@ describe("Autocomplete", function () {
         expect(completion).toContain('media:playsIn');
     });
 
-    it("allows to complete attributes", function() {
+    it("allows to complete attributes", function () {
         write(textarea, '[[category:media:mediathing]]');
         const completion = autocompletion(textarea.value + '[[');
         expect(completion).toContain('media:name');
         expect(completion).toContain('media:year');
     });
+});
+
+describe("Query", function() {
+   it("constructs valid SPARQL query", function () {
+       const expected = 'SELECT ?page WHERE {?page a ?cat . FILTER (?cat="test"||?cat="movie")}';
+       expect(Query.selectPages.categoryIn(['test', 'movie']).build()).toBe(expected);
+   });
 });
