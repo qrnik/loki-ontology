@@ -22,6 +22,21 @@ module.exports = class Ontology {
             .concat(this._getAttributesByClass(clazzId));
     }
 
+    isRelation(relationId) {
+        return this.objectProperties.find(rel => rel.id === relationId);
+    }
+
+    getRelationObject(relationId) {
+        const objectId = this.isRelation(relationId).object;
+        return this._toQualifiedId(objectId);
+    }
+
+    getSubclasses(clazzId) {
+        return this.classes
+            .filter(clazz => clazz.superclasses.indexOf(clazzId) !== -1)
+            .map(clazz => clazz.qualifiedId);
+    }
+
     _getRelationsByClass(clazzId) {
         const clazz = this.classes.find(clazz => clazz.id === clazzId);
         return this.objectProperties

@@ -42,6 +42,10 @@ describe("Ontologies", function () {
        expect(ontologies.isRelation('media:playsIn')).toBeTruthy();
        expect(ontologies.isRelation('media:name')).toBeFalsy();
     });
+
+    it("allows to find relation object", function () {
+       expect(ontologies.getRelationObject('media:playsIn')).toBe('media:movie');
+    });
 });
 
 describe("Ontology", function () {
@@ -68,7 +72,13 @@ describe("Ontology", function () {
 
     it("can find attributes by subject's class", function() {
        const correctAttributes = new Set(['media:name', 'media:year']);
-        expect(new Set(mediaOntology._getAttributesByClass('musiccd'))).toEqual(correctAttributes);
+       expect(new Set(mediaOntology._getAttributesByClass('musiccd'))).toEqual(correctAttributes);
+    });
+
+    it("can find class' subclasses", function() {
+        const correctSubclasses = new Set(['media:book', 'media:classiccd', 'media:musiccd',
+        'media:computergame', 'media:movie', 'media:mediathing']);
+        expect(new Set(mediaOntology.getSubclasses('mediathing'))).toEqual(correctSubclasses);
     });
 });
 
@@ -164,10 +174,10 @@ describe("Query", function() {
         expect(testQuery.toString()).toBe(expected);
     });
 
-    it("allows to execute query", function (done) {
+    it("allows to execute query", function (done) { //requires Access-Control-Allow-Origin
         function callback(result) {
             const expected = new Set(['movies:last_crusade', 'movies:raiders_of_the_lost_ark',
-            'movies:temple_of_doom', 'test', 'test2']);
+            'movies:temple_of_doom', 'test2']);
             expect(new Set(result)).toEqual(expected);
             done();
         }
