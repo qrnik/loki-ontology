@@ -162,6 +162,15 @@ describe("Autocomplete", function () {
         expect(completion).toContain('media:name');
         expect(completion).toContain('media:year');
     });
+
+    it("allows to complete relation objects", function () { //requires Access-Control-Allow-Origin
+        const absoluteSparqlEndpoint = '//localhost/dokuwiki/sparql';
+        const spy = spyOnProperty(Query, 'SPARQL_ENDPOINT', 'get').and
+            .returnValue(absoluteSparqlEndpoint);
+        write(textarea, '[[category:media:actor]]');
+        const completion = autocompletion(textarea.value + '[[media:playsIn::');
+        expect(completion).toEqual(['tomb_raider']);
+    });
 });
 
 describe("Query", function() {

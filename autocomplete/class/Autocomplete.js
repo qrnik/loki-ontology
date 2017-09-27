@@ -1,18 +1,23 @@
 const Textcomplete = require('textcomplete/lib/textcomplete');
 const Textarea = require('textcomplete/lib/textarea');
+const Query = require('./Query.js');
 
 module.exports = class Autocomplete {
     constructor(textarea, ontologies) {
         this._editor = new Textarea.default(textarea);
         this._textcomplete = new Textcomplete.default(this._editor);
         this._ontologies = ontologies;
-        this._textcomplete.register([this._classStrategy(), this._propertyStrategy()]);
+        this._textcomplete.register([
+            this._classStrategy(),
+            this._relationObjectStrategy(),
+            this._propertyStrategy()
+        ]);
     }
 
     _classStrategy() {
         return {
             id: 'class',
-            match: /(\[\[category:)([a-z0-9_\-.:]*)$/,
+            match: /(\[\[category:)([\w\-.]*|[\w\-.]*:[\w\-.]*)$/,
             search: (term, callback) => callback(this._ontologies.searchClasses(term)),
             replace: clazz => `$1${clazz}]]`
         };
@@ -21,7 +26,7 @@ module.exports = class Autocomplete {
     _propertyStrategy() {
         return {
             id: 'relation',
-            match: /(\[\[)([a-z0-9_\-.:]*)$/,
+            match: /(\[\[)([\w\-.]*|[\w\-.]*:[\w\-.]*)$/,
             search: this._searchProperty.bind(this),
             replace: this._replaceProperty.bind(this)
         };
@@ -39,10 +44,34 @@ module.exports = class Autocomplete {
             this._triggerAfterDelay(200);
             return '[[category:';
         } else if (this._ontologies.isRelation(property)) {
+            this._triggerAfterDelay(200);
             return `[[${property}::`;
         } else { //is attribute
             return `[[${property}:=`;
         }
+    }
+
+    _relationObjectStrategy() {
+        return {
+            id: 'relation-object',
+            match: /(\[\[)(([\w\-.]*|[\w\-.]*:[\w\-.]*)::([\w\-.]*|[\w\-.]*:[\w\-.]*))$/,
+            search: this._searchObject.bind(this),
+            replace: this._replaceObject.bind(this)
+        };
+    }
+
+    _searchObject(compoundTerm, callback) {
+        const [relationId, term] = compoundTerm.split("::");
+        const objectId = this._ontologies.getRelationObject(relationId);
+        const objectSubclasses = this._ontologies.getSubclasses(objectId);
+        const query = Query.selectPages.categoryIn(objectSubclasses);
+        this._relationId = relationId;
+        query.execute(foundPages =>
+            callback(foundPages.filter(p => p.startsWith(term))));
+    }
+
+    _replaceObject(objectId) {
+        return `[[${this._relationId}::${objectId}]]`;
     }
 
     setScanner(scanner) {
