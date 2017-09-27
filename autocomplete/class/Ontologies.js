@@ -23,12 +23,26 @@ module.exports = class Ontologies {
         return relations.filter(qid => Ontologies._matchQualifiedId(qid, term))
     }
 
-    isRelation(qualifiedId) {
-        const [ontId, relId] = Ontology.splitQualifiedId(qualifiedId);
-        return this.all
-            .find(ont => ont.id === ontId)
-            .objectProperties
-            .find(rel => rel.id === relId);
+    isRelation(relationId) {
+        return this._dispatch(Ontology.prototype.isRelation, relationId);
+    }
+
+    getRelationObject(relationId) {
+        return this._dispatch(Ontology.prototype.getRelationObject, relationId);
+    }
+
+    getSubclasses(classId) {
+        return this._dispatch(Ontology.prototype.getSubclasses, classId);
+    }
+
+    _dispatch(operation, qualifiedId) {
+        const [ontId, id] = Ontology.splitQualifiedId(qualifiedId);
+        const ontology = this._getOntologyById(ontId);
+        return operation.call(ontology, id);
+    }
+
+    _getOntologyById(ontId) {
+        return this.all.find(ont => ont.id === ontId);
     }
 
     _getPropertiesByClass(categories) {

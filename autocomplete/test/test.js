@@ -2,6 +2,7 @@ const Ontologies = require('../class/Ontologies.js');
 const Ontology = require('../class/Ontology.js');
 const Scanner = require('../class/Scanner.js');
 const Autocomplete = require('../class/Autocomplete.js');
+const Query = require('../class/Query.js');
 
 function getOntoJson() {
     window.ontologies = new Ontologies(readJSON('test/onto.json'));
@@ -41,6 +42,10 @@ describe("Ontologies", function () {
        expect(ontologies.isRelation('media:playsIn')).toBeTruthy();
        expect(ontologies.isRelation('media:name')).toBeFalsy();
     });
+
+    it("allows to find relation object", function () {
+       expect(ontologies.getRelationObject('media:playsIn')).toBe('media:movie');
+    });
 });
 
 describe("Ontology", function () {
@@ -67,7 +72,13 @@ describe("Ontology", function () {
 
     it("can find attributes by subject's class", function() {
        const correctAttributes = new Set(['media:name', 'media:year']);
-        expect(new Set(mediaOntology._getAttributesByClass('musiccd'))).toEqual(correctAttributes);
+       expect(new Set(mediaOntology._getAttributesByClass('musiccd'))).toEqual(correctAttributes);
+    });
+
+    it("can find class' subclasses", function() {
+        const correctSubclasses = new Set(['media:book', 'media:classiccd', 'media:musiccd',
+        'media:computergame', 'media:movie', 'media:mediathing']);
+        expect(new Set(mediaOntology.getSubclasses('mediathing'))).toEqual(correctSubclasses);
     });
 });
 
@@ -145,10 +156,43 @@ describe("Autocomplete", function () {
         expect(completion).toContain('media:playsIn');
     });
 
-    it("allows to complete attributes", function() {
+    it("allows to complete attributes", function () {
         write(textarea, '[[category:media:mediathing]]');
         const completion = autocompletion(textarea.value + '[[');
         expect(completion).toContain('media:name');
         expect(completion).toContain('media:year');
+    });
+
+    it("allows to complete relation objects", function () { //requires Access-Control-Allow-Origin
+        const absoluteSparqlEndpoint = '//localhost/dokuwiki/sparql';
+        const spy = spyOnProperty(Query, 'SPARQL_ENDPOINT', 'get').and
+            .returnValue(absoluteSparqlEndpoint);
+        write(textarea, '[[category:media:actor]]');
+        const completion = autocompletion(textarea.value + '[[media:playsIn::');
+        expect(completion).toEqual(['tomb_raider']);
+    });
+});
+
+describe("Query", function() {
+    beforeEach(function () {
+        window.testQuery = Query.selectPages.categoryIn(['test', 'movie']);
+    });
+
+    it("constructs valid SPARQL query", function () {
+        const expected = 'SELECT ?page WHERE {?page a ?cat . FILTER (?cat="test"||?cat="movie")}';
+        expect(testQuery.toString()).toBe(expected);
+    });
+
+    it("allows to execute query", function (done) { //requires Access-Control-Allow-Origin
+        function callback(result) {
+            const expected = new Set(['movies:last_crusade', 'movies:raiders_of_the_lost_ark',
+            'movies:temple_of_doom', 'test2']);
+            expect(new Set(result)).toEqual(expected);
+            done();
+        }
+        const absoluteSparqlEndpoint = '//localhost/dokuwiki/sparql';
+        const spy = spyOnProperty(Query, 'SPARQL_ENDPOINT', 'get').and
+            .returnValue(absoluteSparqlEndpoint);
+        testQuery.execute(callback);
     });
 });
