@@ -1,13 +1,10 @@
 const Ontologies = require('./class/Ontologies.js');
 const Autocomplete = require('./class/Autocomplete.js');
-const Scanner = require('./class/Scanner.js');
 
 const setup = function (jsonArray) {
     const ontologies = new Ontologies(jsonArray);
     const textarea = document.getElementById('wiki__text');
-    const autocomplete = new Autocomplete(textarea, ontologies);
-    const scanner = new Scanner(textarea);
-    autocomplete.setScanner(scanner);
+    new Autocomplete(textarea, ontologies);
 };
 
 jQuery(document).ready(function () {

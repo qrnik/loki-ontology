@@ -1,6 +1,7 @@
 const Textcomplete = require('textcomplete/lib/textcomplete');
 const Textarea = require('textcomplete/lib/textarea');
 const Query = require('./Query.js');
+const Scanner = require('./Scanner.js');
 
 module.exports = class Autocomplete {
     constructor(textarea, ontologies) {
@@ -16,6 +17,9 @@ module.exports = class Autocomplete {
             this._propertyStrategy()
         ]);
 
+        this._scanner = new Scanner(textarea);
+        this._scanner.emitter.on('scan', this._updateCategories.bind(this));
+        this._updateCategories();
     }
 
     _classStrategy() {
@@ -76,12 +80,6 @@ module.exports = class Autocomplete {
 
     _replaceObject(objectId) {
         return `[[${this._relationId}::${objectId}]]`;
-    }
-
-    setScanner(scanner) {
-        this._scanner = scanner;
-        scanner.emitter.on('scan', this._updateCategories.bind(this));
-        this._updateCategories();
     }
 
     _updateCategories() {

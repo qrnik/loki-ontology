@@ -76,7 +76,8 @@ function write(textarea, text) {
 describe("Scanner", function () {
     beforeAll(function () {
         window.textarea = document.createElement('textarea');
-        window.scanner = new Scanner(textarea);
+        const autocomplete = new Autocomplete(textarea, ontologies);
+        window.scanner = autocomplete._scanner;
     });
 
     it("detects categories on input", function () {
@@ -113,8 +114,6 @@ describe("Autocomplete", function () {
         getOntoJson();
         window.textarea = document.createElement('textarea');
         window.autocomplete = new Autocomplete(textarea, ontologies);
-        window.scanner = new Scanner(textarea);
-        autocomplete.setScanner(scanner);
         Array.from(document.getElementsByClassName('textcomplete-item')).map(i => i.remove());
     });
 
