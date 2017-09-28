@@ -8,58 +8,69 @@ module.exports = class Ontology {
                 this[key] = json[key];
             }
         }
-        this._subclassRelations = this.classRelations.filter(relation => relation.type === 'rdfs:subclassOf');
-        this.classes.forEach(clazz => {
-            clazz.superclasses = this._getSuperclasses(clazz.id);
-            this._addQualifiedId(clazz);
+        this.objectProperties.forEach(objectProp => {
+            objectProp.id = this._toQualifiedId(objectProp.id);
+            objectProp.subject = this._toQualifiedId(objectProp.subject);
+            objectProp.object = this._toQualifiedId(objectProp.object);
         });
-        this.objectProperties.forEach(objectProp => this._addQualifiedId(objectProp));
-        this.dataProperties.forEach(dataProp => this._addQualifiedId(dataProp));
+        this.dataProperties.forEach(dataProp => {
+            dataProp.id = this._toQualifiedId(dataProp.id);
+            dataProp.domain = this._toQualifiedId(dataProp.domain);
+        });
+        this.classRelations.forEach(classRelation => {
+           classRelation.subject = this._toQualifiedId(classRelation.subject);
+           classRelation.object = this._toQualifiedId(classRelation.object);
+        });
+        this.classes.forEach(clazz => {
+            clazz.id = this._toQualifiedId(clazz.id);
+            clazz.superclasses = this._getSuperclasses(clazz.id);
+        });
     }
 
-    getPropertiesByClass(clazzId) {
-        return this._getRelationsByClass(clazzId)
-            .concat(this._getAttributesByClass(clazzId));
+    getPropertiesByClass(classId) {
+        return this._getRelationsByClass(classId)
+            .concat(this._getAttributesByClass(classId));
     }
 
-    isRelation(relationId) {
+    getRelation(relationId) {
         return this.objectProperties.find(rel => rel.id === relationId);
     }
 
     getRelationObject(relationId) {
-        const objectId = this.isRelation(relationId).object;
-        return this._toQualifiedId(objectId);
+        return this.getRelation(relationId).object;
     }
 
-    getSubclasses(clazzId) {
+    getSubclasses(classId) {
         return this.classes
-            .filter(clazz => clazz.superclasses.indexOf(clazzId) !== -1)
-            .map(clazz => clazz.qualifiedId);
+            .filter(clazz => clazz.superclasses.indexOf(classId) !== -1)
+            .map(clazz => clazz.id);
     }
 
-    _getRelationsByClass(clazzId) {
-        const clazz = this.classes.find(clazz => clazz.id === clazzId);
+    _getRelationsByClass(classId) {
+        const clazz = this.classes.find(clazz => clazz.id === classId);
         return this.objectProperties
             .filter(prop => clazz.superclasses.indexOf(prop.subject) !== -1)
-            .map(prop => prop.qualifiedId);
+            .map(prop => prop.id);
     }
 
-    _getAttributesByClass(clazzId) {
-        const clazz = this.classes.find(clazz => clazz.id === clazzId);
+    _getAttributesByClass(classId) {
+        const clazz = this.classes.find(clazz => clazz.id === classId);
         return this.dataProperties
             .filter(prop => clazz.superclasses.indexOf(prop.domain) !== -1)
-            .map(prop => prop.qualifiedId)
+            .map(prop => prop.id)
     }
 
     _getSuperclasses(classId) {
         let superclasses = [classId];
-        let directSuperclasses = this._subclassRelations
+        const subclassRelations = this.classRelations
+            .filter(relation => relation.type === 'rdfs:subclassOf');
+        let directSuperclasses = subclassRelations
             .filter(relation => relation.subject === classId)
             .map(relation => relation.object);
         superclasses.push(...directSuperclasses);
         for (let i = 1; i < superclasses.length; i++) {
             let superclassId = superclasses[i];
-            let superSuperclasses = this._subclassRelations
+            let superSuperclasses = subclassRelations
                 .filter(relation => relation.subject === superclassId)
                 .map(relation => relation.object)
                 .filter(object => superclasses.indexOf(object) === -1); //add super-superclass only if not present
@@ -68,20 +79,18 @@ module.exports = class Ontology {
         return superclasses;
     }
 
-    _addQualifiedId(element) {
-        element.qualifiedId = this._toQualifiedId(element.id);
+    _toQualifiedId(id) {
+        const ontologyId = this.id;
+        return (ontologyId === Ontology.DEFAULT_ID) ? id : ontologyId + ":" + id;
     }
 
-    _toQualifiedId(elementId) {
-        return (this.id === Ontology.DEFAULT_ID) ? elementId : this.id + ":" + elementId;
-    }
-
-    static splitQualifiedId(qualifiedId) {
+    static extractOntologyId(qualifiedId) {
         let array = qualifiedId.split(":");
         if (array.length === 1) {
-            array.unshift(Ontology.DEFAULT_ID);
+            return Ontology.DEFAULT_ID;
+        } else {
+            return array[0];
         }
-        return array;
     }
 };
 module.exports.DEFAULT_ID = 'default';

@@ -11,22 +11,8 @@ function getOntoJson() {
 describe("Ontologies", function () {
     beforeEach(getOntoJson);
 
-    it("have a default ontology", function () {
-        expect(ontologies.defaultOntology.id).toBe(Ontology.DEFAULT_ID);
-    });
-
-    it("have qualifiedId on classes", function () {
-        const qualifiedOntology = ontologies.qualified[0];
-        const qualifiedClazz = qualifiedOntology.classes[0];
-        const qualifiedId = qualifiedOntology.id + ":" + qualifiedClazz.id;
-        expect(qualifiedClazz.qualifiedId).toBe(qualifiedId);
-
-        const defaultClazz = ontologies.defaultOntology.classes[0];
-        expect(defaultClazz.qualifiedId).toBe(defaultClazz.id);
-    });
-
     it("have classes that can be searched", function () {
-        expect(ontologies.searchClasses("me")).toEqual(ontologies.qualified[0].classes.map(c => c.qualifiedId));
+        expect(ontologies.searchClasses("me")).toEqual(ontologies._getOntologyById('media').classes.map(c => c.id));
         expect(ontologies.searchClasses("ac")).toEqual(['media:actor']);
         expect(ontologies.searchClasses("media:ac")).toEqual(['media:actor']);
     });
@@ -51,34 +37,34 @@ describe("Ontologies", function () {
 describe("Ontology", function () {
     beforeEach(function () {
         getOntoJson();
-        window.mediaOntology = ontologies.qualified[0];
+        window.mediaOntology = ontologies._getOntologyById('media');
     });
 
     it("has superclass field on each class", function () {
-        const classicCdClass = mediaOntology.classes.find(c => c.id === 'classiccd');
-        const correctSuperclasses = new Set(['classiccd', 'musiccd', 'mediathing']);
+        const classicCdClass = mediaOntology.classes.find(c => c.id === 'media:classiccd');
+        const correctSuperclasses = new Set(['media:classiccd', 'media:musiccd', 'media:mediathing']);
         expect(new Set(classicCdClass.superclasses)).toEqual(correctSuperclasses);
     });
 
-    it("can turn qualifiedId to array", function() {
-        expect(Ontology.splitQualifiedId('media:actor')).toEqual(['media','actor']);
-        expect(Ontology.splitQualifiedId('class')).toEqual([Ontology.DEFAULT_ID, 'class']);
+    it("can extract ontology name from id", function() {
+        expect(Ontology.extractOntologyId('media:actor')).toEqual('media');
+        expect(Ontology.extractOntologyId('class')).toEqual(Ontology.DEFAULT_ID);
     });
 
     it("can find relations by subject's class", function() {
         const correctRelations = new Set(['media:isConnectedWith', 'media:playsIn']);
-        expect(new Set(mediaOntology._getRelationsByClass('actor'))).toEqual(correctRelations);
+        expect(new Set(mediaOntology._getRelationsByClass('media:actor'))).toEqual(correctRelations);
     });
 
     it("can find attributes by subject's class", function() {
        const correctAttributes = new Set(['media:name', 'media:year']);
-       expect(new Set(mediaOntology._getAttributesByClass('musiccd'))).toEqual(correctAttributes);
+       expect(new Set(mediaOntology._getAttributesByClass('media:musiccd'))).toEqual(correctAttributes);
     });
 
     it("can find class' subclasses", function() {
         const correctSubclasses = new Set(['media:book', 'media:classiccd', 'media:musiccd',
         'media:computergame', 'media:movie', 'media:mediathing']);
-        expect(new Set(mediaOntology.getSubclasses('mediathing'))).toEqual(correctSubclasses);
+        expect(new Set(mediaOntology.getSubclasses('media:mediathing'))).toEqual(correctSubclasses);
     });
 });
 
@@ -163,14 +149,14 @@ describe("Autocomplete", function () {
         expect(completion).toContain('media:year');
     });
 
-    it("allows to complete relation objects", function () { //requires Access-Control-Allow-Origin
-        const absoluteSparqlEndpoint = '//localhost/dokuwiki/sparql';
-        const spy = spyOnProperty(Query, 'SPARQL_ENDPOINT', 'get').and
-            .returnValue(absoluteSparqlEndpoint);
-        write(textarea, '[[category:media:actor]]');
-        const completion = autocompletion(textarea.value + '[[media:playsIn::');
-        expect(completion).toEqual(['tomb_raider']);
-    });
+    // it("allows to complete relation objects", function () { //requires Access-Control-Allow-Origin
+    //     const absoluteSparqlEndpoint = '//localhost/dokuwiki/sparql';
+    //     const spy = spyOnProperty(Query, 'SPARQL_ENDPOINT', 'get').and
+    //         .returnValue(absoluteSparqlEndpoint);
+    //     write(textarea, '[[category:media:actor]]');
+    //     const completion = autocompletion(textarea.value + '[[media:playsIn::');
+    //     expect(completion).toEqual(['tomb_raider']);
+    // });
 });
 
 describe("Query", function() {
@@ -183,16 +169,16 @@ describe("Query", function() {
         expect(testQuery.toString()).toBe(expected);
     });
 
-    it("allows to execute query", function (done) { //requires Access-Control-Allow-Origin
-        function callback(result) {
-            const expected = new Set(['movies:last_crusade', 'movies:raiders_of_the_lost_ark',
-            'movies:temple_of_doom', 'test2']);
-            expect(new Set(result)).toEqual(expected);
-            done();
-        }
-        const absoluteSparqlEndpoint = '//localhost/dokuwiki/sparql';
-        const spy = spyOnProperty(Query, 'SPARQL_ENDPOINT', 'get').and
-            .returnValue(absoluteSparqlEndpoint);
-        testQuery.execute(callback);
-    });
+    // it("allows to execute query", function (done) { //requires Access-Control-Allow-Origin
+    //     function callback(result) {
+    //         const expected = new Set(['movies:last_crusade', 'movies:raiders_of_the_lost_ark',
+    //         'movies:temple_of_doom', 'test2']);
+    //         expect(new Set(result)).toEqual(expected);
+    //         done();
+    //     }
+    //     const absoluteSparqlEndpoint = '//localhost/dokuwiki/sparql';
+    //     const spy = spyOnProperty(Query, 'SPARQL_ENDPOINT', 'get').and
+    //         .returnValue(absoluteSparqlEndpoint);
+    //     testQuery.execute(callback);
+    // });
 });
