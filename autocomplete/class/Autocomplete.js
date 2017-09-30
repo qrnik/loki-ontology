@@ -5,9 +5,6 @@ const Scanner = require('./Scanner.js');
 
 module.exports = class Autocomplete {
     constructor(textarea, ontologies) {
-        this._symbols = {
-            ID : '[\\w\\-.]*|[\\w\\-.]*:[\\w\\-.]*'
-        };
         this._editor = new Textarea.default(textarea);
         this._textcomplete = new Textcomplete.default(this._editor);
         this._ontologies = ontologies;
@@ -25,7 +22,7 @@ module.exports = class Autocomplete {
     _classStrategy() {
         return {
             id: 'class',
-            match: new RegExp(`(\\[\\[category:)(${this._symbols.ID})$`),
+            match: new RegExp(`(\\[\\[category:)(${Scanner.symbols.ID})$`),
             search: (term, callback) => callback(this._ontologies.searchClasses(term)),
             replace: clazz => `$1${clazz}]]`
         };
@@ -34,7 +31,7 @@ module.exports = class Autocomplete {
     _propertyStrategy() {
         return {
             id: 'relation',
-            match: new RegExp(`(\\[\\[)(${this._symbols.ID})$`),
+            match: new RegExp(`(\\[\\[)(${Scanner.symbols.ID})$`),
             search: this._searchProperty.bind(this),
             replace: this._replaceProperty.bind(this)
         };
@@ -62,7 +59,7 @@ module.exports = class Autocomplete {
     _relationObjectStrategy() {
         return {
             id: 'relation-object',
-            match: new RegExp(`(\\[\\[)((${this._symbols.ID})::(${this._symbols.ID}))$`),
+            match: new RegExp(`(\\[\\[)((${Scanner.symbols.ID})::(${Scanner.symbols.ID}))$`),
             search: this._searchObject.bind(this),
             replace: this._replaceObject.bind(this)
         };

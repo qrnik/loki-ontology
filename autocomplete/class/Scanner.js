@@ -2,7 +2,7 @@ const EventEmitter = require('event-emitter');
 
 module.exports = class Scanner {
     constructor(textarea) {
-        this._categoryRegexp = /\[\[category:([a-z0-9_\-.:]*)]]/g;
+        this._categoryRegexp = Scanner._createCategoryRegexp(Scanner.symbols.ID);
         this._queryRegexp = /{{#ask:[^}]*}}/g;
         this.textarea = textarea;
         this.emitter = new EventEmitter();
@@ -26,4 +26,11 @@ module.exports = class Scanner {
         }
         return result;
     }
+
+    static _createCategoryRegexp(category) {
+        return new RegExp(`\\[\\[category:(${category})]]`, 'g');
+    }
+};
+module.exports.symbols = {
+    ID : '[\\w\\-.]*|[\\w\\-.]*:[\\w\\-.]*'
 };
