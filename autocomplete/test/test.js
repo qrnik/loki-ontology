@@ -74,8 +74,9 @@ function write(textarea, text) {
 }
 
 describe("Scanner", function () {
-    beforeAll(function () {
+    beforeEach(function () {
         window.textarea = document.createElement('textarea');
+        textarea.setAttribute('id', 'my-textarea');
         const autocomplete = new Autocomplete(textarea, ontologies);
         window.scanner = autocomplete._scanner;
     });
@@ -99,6 +100,15 @@ describe("Scanner", function () {
         expect(flag).toBe(false);
         write(textarea, '');
         expect(flag).toBe(true);
+    });
+
+    it("highlights categories which are not defined in any ontology", function () {
+        document.body.appendChild(textarea);
+        new Autocomplete(textarea, ontologies);
+        write(textarea, '[[category:media:mediathing]] [[category:wrong]]');
+        jQuery('#my-textarea').highlightWithinTextarea('update');
+        const regex = /<mark>(.*)<\/mark>/;
+        expect(regex.exec(jQuery('.hwt-highlights').html())[1]).toBe('wrong');
     });
 });
 

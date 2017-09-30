@@ -13,8 +13,7 @@ module.exports = class Autocomplete {
             this._relationObjectStrategy(),
             this._propertyStrategy()
         ]);
-
-        this._scanner = new Scanner(textarea);
+        this._scanner = new Scanner(textarea, ontologies);
         this._scanner.emitter.on('scan', this._updateCategories.bind(this));
         this._updateCategories();
     }

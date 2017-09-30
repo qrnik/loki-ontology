@@ -39,3 +39,50 @@
 .editor {
   margin: 1em 0 1em;
 }
+
+.hwt-container {
+  position: relative;
+  overflow: hidden !important;
+  -webkit-text-size-adjust: none !important;
+}
+
+.hwt-backdrop {
+  position: absolute !important;
+  top: 0 !important;
+  right: -99px !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  padding-right: 99px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.hwt-highlights {
+  width: auto !important;
+  height: auto !important;
+  border-color: transparent !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  color: transparent !important;
+  overflow: hidden !important;
+  line-height: normal;
+  padding: 2px;
+  font-family: Consolas,"Andale Mono WT","Andale Mono","Bitstream Vera Sans Mono","Nimbus Mono L",Monaco,"Courier New",monospace;
+}
+
+.hwt-input {
+  display: block !important;
+  position: relative !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.hwt-content {
+  background: none transparent !important;
+}
+
+.hwt-content mark {
+  padding: 0 !important;
+  color: inherit;
+  background-color: #fcc;
+}

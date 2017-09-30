@@ -5,6 +5,7 @@
   "main": "autocomplete.js",
   "dependencies": {
     "event-emitter": "^0.3.5",
+    "highlight-within-textarea": "^2.0.4",
     "textcomplete": "^0.13.1"
   },
   "devDependencies": {
