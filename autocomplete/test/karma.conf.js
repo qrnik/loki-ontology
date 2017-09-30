@@ -15,9 +15,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test/*.js',
-        'node_modules/karma-read-json/karma-read-json.js',
         'node_modules/jquery/dist/jquery.js',
+        'test/*.js',
+        'node_modules/karma-read-json/karma-read-json.js',
         {pattern: 'test/onto.json', included: false, served: true}
     ],
 
