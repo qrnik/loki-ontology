@@ -17,8 +17,8 @@ module.exports = class Ontologies {
     }
 
     searchProperties(categories, term) {
-        const relations = this._getPropertiesByClass(categories);
-        return relations.filter(id => Ontologies._matchId(id, term))
+        const properties = this._getPropertiesByClass(categories);
+        return properties.filter(id => Ontologies._matchId(id, term))
     }
 
     isRelation(relationId) {

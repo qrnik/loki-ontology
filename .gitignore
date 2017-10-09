@@ -68,3 +68,5 @@ fabric.properties
 # webpack
 autocomplete/node_modules
 autocomplete/dist
+
+autocomplete/watchify

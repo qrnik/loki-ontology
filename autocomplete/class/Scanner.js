@@ -4,6 +4,7 @@ require('highlight-within-textarea');
 module.exports = class Scanner {
     constructor(textarea, ontologies) {
         this._categoryRegexp = Scanner._createCategoryRegexp(Scanner.symbols.ID);
+        this._relationRegexp = Scanner._createRelationRegexp(Scanner.symbols.ID);
         this._attributeRegexp = Scanner._createAttributeRegexp(Scanner.symbols.ID);
         this._queryRegexp = /{{#ask:[^}]*}}/g;
         this._textarea = textarea;
@@ -37,22 +38,30 @@ module.exports = class Scanner {
     _highlight(text) {
         const categories = Scanner._findAllMatches(text, this._categoryRegexp)
             .map(match => match[1]);
+        const relations = Scanner._findAllMatches(text, this._relationRegexp)
+            .map(match => match[1]);
         const attributes = Scanner._findAllMatches(text, this._attributeRegexp)
             .map(match => match[1]);
         const categoriesToHighlight = jQuery.makeArray(jQuery(categories).not(this._ontologies.classes));
         const attributesToHighlight = attributes.filter(attr => this._isNotValidAttribute(attr));
+        const relationsToHighlight = relations.filter(rel => !this._ontologies.isRelation(rel));
         return categoriesToHighlight.map(Scanner._createCategoryRegexp).concat(
-            attributesToHighlight.map(Scanner._createAttributeRegexp)
+            attributesToHighlight.map(Scanner._createAttributeRegexp),
+            relationsToHighlight.map(Scanner._createRelationRegexp)
         )
     }
 
     _isNotValidAttribute(attribute) {
         return !this._ontologies.isRelation(attribute) &&
-            this._ontologies.searchProperties(this.categories, attribute).length === 0;
+            !(this._ontologies.searchProperties(this.categories, attribute).indexOf(attribute) !== -1);
     }
 
     static _createCategoryRegexp(category) {
         return new RegExp(`\\[\\[category:(${category})]]`, 'g');
+    }
+
+    static _createRelationRegexp(relation) {
+        return new RegExp(`\\[\\[(${relation})::(${Scanner.symbols.ID})]]`, 'g');
     }
 
     static _createAttributeRegexp(attribute) {
