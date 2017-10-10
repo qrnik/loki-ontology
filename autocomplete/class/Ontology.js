@@ -37,7 +37,8 @@ module.exports = class Ontology {
     }
 
     getRelationObject(relationId) {
-        return this.getRelation(relationId).object;
+        const relation = this.getRelation(relationId);
+        return relation ? relation.object : null;
     }
 
     getSubclasses(classId) {

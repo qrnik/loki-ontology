@@ -67,6 +67,10 @@ module.exports = class Autocomplete {
     _searchObject(compoundTerm, callback) {
         const [relationId, term] = compoundTerm.split("::");
         const objectId = this._ontologies.getRelationObject(relationId);
+        if (!objectId) {
+            callback([]);
+            return;
+        }
         const objectSubclasses = this._ontologies.getSubclasses(objectId);
         const query = Query.selectPages.categoryIn(objectSubclasses);
         this._relationId = relationId;
