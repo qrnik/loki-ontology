@@ -11,10 +11,15 @@ module.exports = class Scanner {
         this._ontologies = ontologies;
         this.emitter = new EventEmitter();
         this._textarea.addEventListener('input', this._scan.bind(this));
+        this._hasSemanticError = false;
         this._scan();
         jQuery('#' + this._textarea.getAttribute('id')).highlightWithinTextarea({
             highlight: this._highlight.bind(this)
         });
+    }
+
+    validate() {
+        return this._hasSemanticError ? confirm("Page contains semantic errors. Continue?") : true;
     }
 
     _scan() {
@@ -47,10 +52,12 @@ module.exports = class Scanner {
         const categoriesToHighlight = jQuery.makeArray(jQuery(categories).not(this._ontologies.classes));
         const attributesToHighlight = attributes.filter(attr => this._isNotValidAttribute(attr));
         const relationsToHighlight = relations.filter(rel => !this._ontologies.isRelation(rel));
-        return categoriesToHighlight.map(Scanner._createCategoryRegexp).concat(
+        const highlights = categoriesToHighlight.map(Scanner._createCategoryRegexp).concat(
             attributesToHighlight.map(Scanner._createAttributeRegexp),
             relationsToHighlight.map(Scanner._createRelationRegexp)
-        )
+        );
+        this._hasSemanticError = highlights.length !== 0;
+        return highlights;
     }
 
     _isNotValidAttribute(attribute) {

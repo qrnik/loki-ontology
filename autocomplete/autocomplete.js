@@ -4,7 +4,8 @@ const Autocomplete = require('./class/Autocomplete.js');
 const setup = function (jsonArray) {
     const ontologies = new Ontologies(jsonArray);
     const textarea = document.getElementById('wiki__text');
-    new Autocomplete(textarea, ontologies);
+    const autocomplete = new Autocomplete(textarea, ontologies);
+    document.getElementById('dw__editform').onsubmit = autocomplete._scanner.validate.bind(autocomplete._scanner);
 };
 
 jQuery(document).ready(function () {
