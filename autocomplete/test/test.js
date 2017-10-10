@@ -82,7 +82,7 @@ describe("Scanner", function () {
     });
 
     it("detects categories on input", function () {
-        const CATEGORY = 'media:text';
+        const CATEGORY = 'media:actor';
         write(textarea, `ddd[[category:${CATEGORY}]]`);
         expect(scanner.categories).toContain(CATEGORY);
         write(textarea, '');
@@ -128,9 +128,9 @@ describe("Autocomplete", function () {
     });
 
     it("tracks categories defined in textarea", function () {
-        const CATEGORY = 'test';
+        const CATEGORY = 'media:actor';
         write(textarea, `[[category:${CATEGORY}]]`);
-        expect(autocomplete._categories).toEqual(['test']);
+        expect(autocomplete._categories).toEqual([CATEGORY]);
     });
 
     it("allows to complete '[[category:'", function () {

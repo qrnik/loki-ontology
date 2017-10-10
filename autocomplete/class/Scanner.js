@@ -20,8 +20,10 @@ module.exports = class Scanner {
     _scan() {
         const text = this._textarea.value;
         const textWithoutQueries = text.replace(this._queryRegexp, "");
-        this.categories = Scanner._findAllMatches(textWithoutQueries, this._categoryRegexp)
+        const categories = Scanner._findAllMatches(textWithoutQueries, this._categoryRegexp)
             .map(match => match[1]);
+        const validCategories = jQuery(categories).filter(this._ontologies.classes);
+        this.categories = jQuery.makeArray(validCategories);
         this.emitter.emit('scan');
     }
 
