@@ -1,4 +1,5 @@
 const EventEmitter = require('event-emitter');
+const Query = require('./Query.js');
 require('highlight-within-textarea');
 
 module.exports = class Scanner {
@@ -7,11 +8,16 @@ module.exports = class Scanner {
         this._relationRegexp = Scanner._createRelationRegexp(Scanner.symbols.ID);
         this._attributeRegexp = Scanner._createAttributeRegexp(Scanner.symbols.ID);
         this._queryRegexp = /{{#ask:[^}]*}}/g;
+
         this._textarea = textarea;
-        this._ontologies = ontologies;
-        this.emitter = new EventEmitter();
         this._textarea.addEventListener('input', this._scan.bind(this));
+        this._ontologies = ontologies;
         this._hasSemanticError = false;
+
+        this.emitter = new EventEmitter();
+        this.pages = {};
+
+        this.updatePageList();
         this._scan();
         jQuery('#' + this._textarea.getAttribute('id')).highlightWithinTextarea({
             highlight: this._highlight.bind(this)
@@ -20,6 +26,16 @@ module.exports = class Scanner {
 
     validate() {
         return this._hasSemanticError ? confirm("Page contains semantic errors. Continue?") : true;
+    }
+
+    updatePageList() {
+        this._ontologies.classes.forEach(this._queryForPages.bind(this));
+    }
+
+    _queryForPages(clazz) {
+        const objectSubclasses = this._ontologies.getSubclasses(clazz);
+        const query = Query.selectPages.categoryIn(objectSubclasses);
+        query.execute(foundPages => this.pages[clazz] = foundPages);
     }
 
     _scan() {
