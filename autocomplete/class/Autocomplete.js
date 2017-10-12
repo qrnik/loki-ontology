@@ -1,6 +1,5 @@
 const Textcomplete = require('textcomplete/lib/textcomplete');
 const Textarea = require('textcomplete/lib/textarea');
-const Query = require('./Query.js');
 const Scanner = require('./Scanner.js');
 
 module.exports = class Autocomplete {
@@ -71,11 +70,9 @@ module.exports = class Autocomplete {
             callback([]);
             return;
         }
-        const objectSubclasses = this._ontologies.getSubclasses(objectId);
-        const query = Query.selectPages.categoryIn(objectSubclasses);
         this._relationId = relationId;
-        query.execute(foundPages =>
-            callback(foundPages.filter(p => p.startsWith(term))));
+        const pages = this._scanner.pages[objectId];
+        callback(pages.filter(p => p.startsWith(term)));
     }
 
     _replaceObject(objectId) {
