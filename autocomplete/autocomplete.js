@@ -9,7 +9,7 @@ const setup = function (jsonArray) {
 };
 
 jQuery(document).ready(function () {
-    jQuery.getJSON("data/pages/special/ontology/onto.json", setup);
+    setup(JSON.parse(JSINFO['onto']));
 });
 
 

@@ -17,7 +17,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
 
     function register(Doku_Event_Handler $controller)
     {
-        //$controller->register_hook('IO_WIKIPAGE_WRITE', 'BEFORE', $this, "onSave");
+        $controller->register_hook('DOKUWIKI_STARTED', 'AFTER',  $this, 'addOntoJson');
         $controller->register_hook('PARSER_WIKITEXT_PREPROCESS', 'BEFORE', $this, "transformIfOntology");
         $controller->register_hook('HTML_EDITFORM_OUTPUT', 'BEFORE', $this, "onEdit");
     }
@@ -131,6 +131,12 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
     {
         $js = file_get_contents(self::AUTOCOMPLETE_JS_PATH);
         $event->data->addElement($this->toScriptTag($js));
+    }
+
+    function addOntoJson(Doku_Event $event, $param) {
+        global $JSINFO;
+        $ontojson = file_get_contents(self::ONTO_JSON_PATH);
+        $JSINFO['onto'] = $ontojson;
     }
 
     private function transformWithXSLT($input)
