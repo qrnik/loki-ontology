@@ -9,6 +9,9 @@
     "textcomplete": "^0.13.1"
   },
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
     "browserify": "^14.4.0",
     "jasmine": "^2.8.0",
     "jquery": "^3.2.1",
