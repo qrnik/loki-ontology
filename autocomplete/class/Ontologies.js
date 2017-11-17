@@ -42,7 +42,7 @@ module.exports = class Ontologies {
     _delegate(operation, id) {
         const ontId = Ontology.extractOntologyId(id);
         const ontology = this._getOntologyById(ontId);
-        return operation.call(ontology, id);
+        return ontology ? operation.call(ontology, id) : null;
     }
 
     _getOntologyById(ontId) {
