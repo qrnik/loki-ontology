@@ -59,6 +59,7 @@ module.exports = class Scanner {
     }
 
     _highlight(text) {
+        text = text.replace(this._queryRegexp, "");
         const categories = Scanner._findAllMatches(text, this._categoryRegexp)
             .map(match => match[1]);
         const attributes = Scanner._findAllMatches(text, this._attributeRegexp)
