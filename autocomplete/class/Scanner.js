@@ -92,19 +92,19 @@ module.exports = class Scanner {
     }
 
     static _createCategoryRegexp(category) {
-        return new RegExp(`\\[\\[category:(${category})]]`, 'g');
+        return new RegExp(`\\[\\[category:(${category})(\\||]])`, 'g');
     }
 
     static _createRelationRegexp(relation) {
-        return new RegExp(`\\[\\[(${relation})::(${Scanner.symbols.ID})]]`, 'g');
+        return new RegExp(`\\[\\[(${relation})::(${Scanner.symbols.ID})(\\||]])`, 'g');
     }
 
     static _createObjectRegexp(object) {
-        return new RegExp(`\\[\\[(?:${Scanner.symbols.ID})::(${object})]]`, 'g');
+        return new RegExp(`\\[\\[(?:${Scanner.symbols.ID})::(${object})(\\||]])`, 'g');
     }
 
     static _createAttributeRegexp(attribute) {
-        return new RegExp(`\\[\\[(${attribute}):=[^\\]]+]]`, 'g');
+        return new RegExp(`\\[\\[(${attribute}):=[^\\]\\|]+(\\||]])`, 'g');
     }
 
 };
