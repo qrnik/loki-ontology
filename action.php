@@ -11,6 +11,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
     const ONTOLOGY_XSLT_PATH = "lib/plugins/lokiontology/ontology.xslt";
     const ONTOLOGY_EDIT_XSLT_PATH = "lib/plugins/lokiontology/ontology_edit.xslt";
     const ONTOLOGY_JS_PATH = "lib/plugins/lokiontology/ontology_edit.js";
+    const ONTOLOGY_EXPORT_SCRIPT_PATH = "lib/plugins/lokiontology/ontology_export.js";
     const AUTOCOMPLETE_JS_PATH = "lib/plugins/lokiontology/autocomplete/dist/bundle.js";
     const ONTOLOGY_FOLDER_PATH = "data/pages/special/ontology/";
     const ONTO_JSON_PATH = "data/pages/special/ontology/onto.json";
@@ -33,6 +34,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
             return false;
 
         $event->data = $this->transformWithXSLT($event->data);
+        $this->addScript($event, self::ONTOLOGY_EXPORT_SCRIPT_PATH);
 
         $this->createOntoJson();
     }
@@ -98,7 +100,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
             $this->swapToOntologyEditor($event, $param);
 
         else
-            $this->insertAutocomplete($event, $param);
+            $this->addScript($event, self::AUTOCOMPLETE_JS_PATH);
     }
 
     private function swapToOntologyEditor(Doku_Event $event, $param)
@@ -127,9 +129,9 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         $event->data->insertElement($wikiEditbar, $html);
     }
 
-    private function insertAutocomplete(Doku_Event $event, $param)
+    private function addScript(Doku_Event $event, $scriptPath)
     {
-        $js = file_get_contents(self::AUTOCOMPLETE_JS_PATH);
+        $js = file_get_contents($scriptPath);
         $event->data->addElement($this->toScriptTag($js));
     }
 
