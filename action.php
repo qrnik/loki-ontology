@@ -19,15 +19,20 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
 
     function register(Doku_Event_Handler $controller)
     {
-        $controller->register_hook('DOKUWIKI_STARTED', 'AFTER',  $this, 'addOntoJson');
+        $controller->register_hook('DOKUWIKI_STARTED', 'AFTER',  $this, 'addJsVariables');
         $controller->register_hook('PARSER_WIKITEXT_PREPROCESS', 'BEFORE', $this, "transformIfOntology");
         $controller->register_hook('HTML_EDITFORM_OUTPUT', 'BEFORE', $this, "onEdit");
     }
 
-    function addOntoJson(Doku_Event $event, $param) 
+    function addJsVariables(Doku_Event $event, $param) 
     {
+        global $INFO;
         $ontojson = file_get_contents(self::ONTO_JSON_PATH);
         $this->passValueToJs('onto', $ontojson);
+        $exportXslt = file_get_contents(self::ONTOLOGY_EXPORT_XSLT_PATH);
+        $this->passValueToJs('xslt', $exportXslt);
+        $xml = file_get_contents($INFO['filepath']);
+        $this->passValueToJs('xml', $xml);
     }
 
     function transformIfOntology(Doku_Event $event, $param)
@@ -39,11 +44,6 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         $isNotOntology = preg_match("/^(<\?xml.*\?>)?<ontology>.*<\/ontology>$/", $flatData) != 1;
         if($isNotOntology)
             return false;
-
-        $this->addScript($event, self::ONTOLOGY_EXPORT_SCRIPT_PATH);
-        $this->passValueToJs('xml', $event->data);
-        $exportXslt = file_get_contents(self::ONTOLOGY_EXPORT_XSLT_PATH);
-        $this->passValueToJs('xslt', $exportXslt);
 
         $event->data = $this->transformWithXSLT($event->data);
 
