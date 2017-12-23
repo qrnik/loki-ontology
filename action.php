@@ -39,8 +39,10 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         if($isNotOntology)
             return false;
 
-        $event->data = $this->transformWithXSLT($event->data);
         $this->addScript($event, self::ONTOLOGY_EXPORT_SCRIPT_PATH);
+        $this->passValueToJs('xml', $event->data);
+
+        $event->data = $this->transformWithXSLT($event->data);
 
         $this->createOntoJson();
     }
