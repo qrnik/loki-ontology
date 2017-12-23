@@ -1,17 +1,29 @@
-function exportOntology(){
-    var xsltProcessor = new XSLTProcessor();
-    var xslt = jQuery.parseXml(JSINFO['xslt']);
-    xsltProcessor.importStylesheet(xslt);
-    var baseUri = document.URL.split("?")[0];
-    xsltProcessor.setParameter(null, "baseUri", baseUri);
-    var xml = jQuery.parseXml(JSINFO['xml']);
-    var doc = xsltProcessor.transformToDocument(xml);
-    var turtle = doc.getElementsByTagName("transformiix:result")[0].childNodes[0].nodeValue;
-    document.open('data:application/octet-stream', + encodeURIComponent(turtle));
-}
+jQuery(document).ready(function () {
+    function ontologyAsTurtle(){
+        var xsltProcessor = new XSLTProcessor();
+        var xslt = jQuery.parseXML(JSINFO['xslt']);
+        xsltProcessor.importStylesheet(xslt);
+        var baseUri = document.URL.split("?")[0];
+        xsltProcessor.setParameter("", "baseUri", baseUri);
+        var xml = jQuery.parseXML(JSINFO['xml']);
+        var doc = xsltProcessor.transformToDocument(xml);
+        return doc.getElementsByTagName("transformiix:result")[0].childNodes[0].nodeValue;
+    }
 
-var button = jQuery(".button .button")[0];
-button.attr("value", "Export to RDFS");
-button.attr("type", "button");
-button.attr("download", "ont.ttl");
-button.click(exportOntology)
+    function download() {
+        var turtle = ontologyAsTurtle();
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/turtle;charset=utf-8,' + encodeURIComponent(turtle));
+        element.setAttribute('download', "ontology.ttl");
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        return false;
+    }
+    
+    var form = jQuery("form.button")
+    form.submit(download);
+    var button = jQuery(".button .button");
+    button.attr("value", "Export to RDFS");
+});
