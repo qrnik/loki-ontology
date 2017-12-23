@@ -1,3 +1,4 @@
+"use strict";
 jQuery(document).ready(function () {
     function ontologyAsTurtle(){
         var xsltProcessor = new XSLTProcessor();
