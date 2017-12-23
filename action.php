@@ -23,6 +23,12 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         $controller->register_hook('HTML_EDITFORM_OUTPUT', 'BEFORE', $this, "onEdit");
     }
 
+    function addOntoJson(Doku_Event $event, $param) 
+    {
+        $ontojson = file_get_contents(self::ONTO_JSON_PATH);
+        $this->passValueToJs('onto', $ontojson);
+    }
+
     function transformIfOntology(Doku_Event $event, $param)
     {
         if(trim($event->data) == "")
@@ -37,6 +43,17 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         $this->addScript($event, self::ONTOLOGY_EXPORT_SCRIPT_PATH);
 
         $this->createOntoJson();
+    }
+
+    function onEdit(Doku_Event $event, $param)
+    {
+        $isOntologyPage = strpos($event->data->_hidden["id"], "special:ontology:") === 0;
+
+        if($isOntologyPage)
+            $this->swapToOntologyEditor($event, $param);
+
+        else
+            $this->addScript($event, self::AUTOCOMPLETE_JS_PATH);
     }
 
     private function createOntoJson()
@@ -92,17 +109,6 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         return $ontology_element;
     }
 
-    function onEdit(Doku_Event $event, $param)
-    {
-        $isOntologyPage = strpos($event->data->_hidden["id"], "special:ontology:") === 0;
-
-        if($isOntologyPage)
-            $this->swapToOntologyEditor($event, $param);
-
-        else
-            $this->addScript($event, self::AUTOCOMPLETE_JS_PATH);
-    }
-
     private function swapToOntologyEditor(Doku_Event $event, $param)
     {
         define('PAGE_EDIT_FIELD', 0);
@@ -129,18 +135,6 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         $event->data->insertElement($wikiEditbar, $html);
     }
 
-    private function addScript(Doku_Event $event, $scriptPath)
-    {
-        $js = file_get_contents($scriptPath);
-        $event->data->addElement($this->toScriptTag($js));
-    }
-
-    function addOntoJson(Doku_Event $event, $param) {
-        global $JSINFO;
-        $ontojson = file_get_contents(self::ONTO_JSON_PATH);
-        $JSINFO['onto'] = $ontojson;
-    }
-
     private function transformWithXSLT($input)
     {
         $xslt = file_get_contents(self::ONTOLOGY_XSLT_PATH);
@@ -152,8 +146,20 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
         );
     }
 
+    private function addScript(Doku_Event $event, $scriptPath)
+    {
+        $js = file_get_contents($scriptPath);
+        $event->data->addElement($this->toScriptTag($js));
+    }
+
     private function toScriptTag($script) {
         return "<script type='text/javascript'>\n$script\n</script>";
+    }
+
+    private function passValueToJs($key, $value) 
+    {
+        global $JSINFO;
+        $JSINFO[$key] = $value;
     }
 }
 
