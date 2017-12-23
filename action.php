@@ -10,6 +10,7 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
                 "</ontology>";
     const ONTOLOGY_XSLT_PATH = "lib/plugins/lokiontology/ontology.xslt";
     const ONTOLOGY_EDIT_XSLT_PATH = "lib/plugins/lokiontology/ontology_edit.xslt";
+    const ONTOLOGY_EXPORT_XSLT_PATH = "lib/plugins/lokiontology/ontology_export.xslt";
     const ONTOLOGY_JS_PATH = "lib/plugins/lokiontology/ontology_edit.js";
     const ONTOLOGY_EXPORT_SCRIPT_PATH = "lib/plugins/lokiontology/ontology_export.js";
     const AUTOCOMPLETE_JS_PATH = "lib/plugins/lokiontology/autocomplete/dist/bundle.js";
@@ -41,6 +42,8 @@ class action_plugin_lokiontology extends DokuWiki_Action_Plugin
 
         $this->addScript($event, self::ONTOLOGY_EXPORT_SCRIPT_PATH);
         $this->passValueToJs('xml', $event->data);
+        $exportXslt = file_get_contents(self::ONTOLOGY_EXPORT_XSLT_PATH);
+        $this->passValueToJs('xslt', $exportXslt);
 
         $event->data = $this->transformWithXSLT($event->data);
 
