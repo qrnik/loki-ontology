@@ -2,7 +2,7 @@
     <xsl:output method="text" encoding="UTF-8"/>
     <xsl:param name="baseUri" />
     <xsl:template match="ontology">
-        <xsl:value-of select="concat('@base &lt;', $baseUri, '/', id, '&gt; .&#xa;')"/>
+        <xsl:value-of select="concat('@base &lt;', $baseUri, '/', id, '/', '&gt; .&#xa;')"/>
         <xsl:text disable-output-escaping="yes">
 @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
 @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
