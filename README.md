@@ -38,3 +38,7 @@ I use [Browserify](http://browserify.org/) along with [Babelify](https://github.
 2. Navigate to `lokiontology/autocomplete` and execute `npm install`.
 3. Currently I use modified version of [highlight-within-textarea](https://github.com/lonekorean/highlight-within-textarea) plugin to suit my needs. After pulling dependencies with `npm`, you should pull [my fork](https://github.com/pwamej/highlight-within-textarea) into `node_modules/higlight-within-textarea`.
 4. Execute `browserify autocomplete.js class/* -t babelify -o dist/bundle.js` to bundle code.
+
+## Used libraries
+- [highlight-within-textarea](https://github.com/lonekorean/highlight-within-textarea) by lonekorean
+- [textcomplete](https://github.com/yuku-t/textcomplete) by yuku-t
