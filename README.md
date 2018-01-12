@@ -2,10 +2,13 @@
 
 [DokuWiki](https://www.dokuwiki.org/dokuwiki#) plugin that adds ontology support to [Loki](http://loki.ia.agh.edu.pl/wiki/docs:loki-about). This makes process of creating knowledge base easier by validating semantic information on pages.
 
+![](https://github.com/pwamej/loki-ontology/blob/master/loki-ontology.gif)
+
 ## Features
 - editor that lets you create ontologies used in wiki,
 - autocompletion of categories, attributes, relations and relation objects (all described in ontologies),
-- detection of semantic errors in pages, such as wrong relation used in page source.
+- detection of semantic errors in pages, such as wrong relation used in page source,
+- export ontology data to RDFS/Turtle.
 
 ## Installation
 Download plugin's newest release from [Releases](https://github.com/pwamej/loki-ontology/releases) page. 
